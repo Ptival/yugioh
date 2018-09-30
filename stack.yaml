@@ -1,0 +1,8 @@
+flags: {}
+
+extra-deps:
+
+resolver: lts-11.11
+
+packages:
+  - '.'

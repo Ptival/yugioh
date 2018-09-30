@@ -1,0 +1,33 @@
+Name:               yugioh
+Version:            0.1
+Synopsis:           Yu-Gi-Oh! simulator
+Description:        No copyright infrigement intended! :D
+License:            GPL-3
+License-file:       LICENSE
+Author:             Valentin Robert
+Maintainer:         valentin.robert.42@gmail.com
+Stability:          Experimental
+Category:           Games
+Build-type:         Simple
+Cabal-version:      >=1.22
+
+Library
+  default-language: Haskell2010
+  ghc-options:      -Wall
+  hs-source-dirs:   lib
+  build-depends:    base,
+                    interpolate,
+                    lens
+  exposed-modules:  Card,
+                    Card.BlueEyesWhiteDragon
+  other-modules:    Attribute,
+                    Type
+
+Executable yugioh
+  default-language: Haskell2010
+  ghc-options:      -Wall
+  hs-source-dirs:   exec
+  main-is:          Main.hs
+  build-depends:
+    base,
+    yugioh
