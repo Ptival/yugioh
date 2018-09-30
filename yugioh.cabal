@@ -16,12 +16,17 @@ Library
   ghc-options:      -Wall
   hs-source-dirs:   lib
   build-depends:    base,
+                    extensible-effects >= 3.1 && < 3.2,
                     interpolate,
                     lens
   exposed-modules:  Card,
                     Card.BlueEyesWhiteDragon
+                    Configuration,
+                    Player
   other-modules:    Attribute,
-                    Type
+                    Mat,
+                    Type,
+                    Utils
 
 Executable yugioh
   default-language: Haskell2010
@@ -30,4 +35,5 @@ Executable yugioh
   main-is:          Main.hs
   build-depends:
     base,
+    extensible-effects,
     yugioh

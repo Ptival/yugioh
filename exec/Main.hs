@@ -4,9 +4,19 @@ module Main (
   main,
   ) where
 
-import Card
+import Control.Eff
+import Control.Eff.Reader.Strict
+
 import Card.BlueEyesWhiteDragon
+import Configuration
+import Player
+
+player :: Player
+player =
+  run
+  $ runReader testingConfiguration
+  $ makePlayer "Seto Kaiba" [blueEyesWhiteDragon, blueEyesWhiteDragon]
 
 main :: IO ()
 main = do
-  putStrLn $ display blueEyesWhiteDragon
+  putStrLn $ display player
