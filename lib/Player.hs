@@ -9,24 +9,25 @@
 
 module Player (
   Player,
-  display,
+  Player.display,
   hand,
   lifePoints,
   makePlayer,
   mat,
-  name,
+  Player.name,
   ) where
 
-import           Control.Eff
-import           Control.Eff.Reader.Strict
-import           Control.Lens
-import           Data.String.Interpolate
-import           GHC.Generics
+import Control.Eff
+import Control.Eff.Reader.Strict
+import Control.Lens
+import Data.String.Interpolate
+import GHC.Generics
 
-import qualified Card
-import           Configuration
-import qualified Mat
-import           Utils
+import Card
+import Configuration
+import Duelist
+import Mat
+import Utils
 
 data Player = Player
   { _name       :: String
@@ -40,12 +41,12 @@ makeLenses ''Player
 
 makePlayer ::
   ( Member (Reader Configuration) e ) =>
-  String -> [Card.Card] -> Eff e Player
-makePlayer playerName playerDeck = do
+  Duelist -> Eff e Player
+makePlayer duelist = do
   lp <- view originalLifePoints <$> ask
-  playerMat <- Mat.makeMat playerDeck
+  playerMat <- Mat.makeMat $ view Duelist.deck duelist
   return $ Player
-    { _name       = playerName
+    { _name       = view Duelist.name duelist
     , _hand       = []
     , _lifePoints = lp
     , _mat        = playerMat
