@@ -1,6 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 
--- |
+-- | A `Duelist` describes a duelist prior to any duel.  It contain information
+-- | like their names, and the deck they'd like to use for the duel.
 
 module Duelist (
   Duelist(..),

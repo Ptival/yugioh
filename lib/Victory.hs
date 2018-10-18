@@ -1,10 +1,9 @@
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
 
--- |
+-- | A `Victory` describes who won a duel, and how they won it.
 
 module Victory (
   Victory,
@@ -15,13 +14,11 @@ module Victory (
 
 import Control.Lens
 import Data.String.Interpolate
-import GHC.Generics
 
 import Player
 
 data VictoryCondition
   = OpponentRanOutOfCards
-  deriving (Eq, Generic, Show)
 
 displayVictoryCondition :: VictoryCondition -> String
 displayVictoryCondition = \case
@@ -32,7 +29,6 @@ data Victory = Victory
   { _winner           :: Player
   , _victoryCondition :: VictoryCondition
   }
-  deriving (Eq, Generic, Show)
 
 makeLenses ''Victory
 

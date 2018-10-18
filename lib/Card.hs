@@ -3,7 +3,9 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
 
--- | Define the `Card` datatype.
+-- | A `Card` is a card when not in a particular position (for instance, in the
+-- | player's hand, or in the graveyard).  When it is played on the field, it
+-- | will require extra informtaion to keep track of what happens to it.
 
 module Card (
   Card(..),
