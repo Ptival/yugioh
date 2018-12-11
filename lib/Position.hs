@@ -7,10 +7,13 @@
 module Position (
   Position(..),
   display,
+  flip,
   isDefensePosition,
   ) where
 
 import GHC.Generics
+
+import Prelude      hiding (flip)
 
 data Position
   = Attack
@@ -23,6 +26,11 @@ display = \case
   Attack          ->            "Attack position"
   FaceDownDefense -> "Face-Down Defense position"
   FaceUpDefense   ->   "Face-Up Defense position"
+
+flip :: Position -> Position
+flip Attack          = Attack
+flip FaceDownDefense = FaceUpDefense
+flip FaceUpDefense   = FaceUpDefense
 
 isDefensePosition :: Position -> Bool
 isDefensePosition = \case

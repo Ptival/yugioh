@@ -15,6 +15,7 @@ module Player (
   hand,
   hasDrawnCard,
   hasNormalSummoned,
+  inflictDamage,
   lifePoints,
   makePlayer,
   mat,
@@ -74,3 +75,6 @@ Hand (#{length _hand}):
 #{h}
 TEST
 #{Mat.display displayDeck _mat}|]
+
+inflictDamage :: Int -> Player -> Player
+inflictDamage damage = over lifePoints (\ lp -> max 0 (lp - damage))

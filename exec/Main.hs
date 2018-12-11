@@ -13,6 +13,8 @@ import Control.Monad (forM_)
 
 import Card.BeaverWarrior
 import Card.BlueEyesWhiteDragon
+import Card.DarkMagician
+import Card.SaggiTheDarkClown
 import ChooseMove
 import Driver
 import Duelist
@@ -23,13 +25,17 @@ import Victory
 setoKaiba :: Duelist
 setoKaiba = Duelist
   { _name = "Seto Kaiba"
-  , _deck = replicate 3 blueEyesWhiteDragon
+  , _deck = []
+            ++ replicate 3 blueEyesWhiteDragon
+            ++ replicate 3 saggiTheDarkClown
   }
 
 yamiYugi :: Duelist
 yamiYugi = Duelist
   { _name = "Yami Yugi"
-  , _deck = replicate 3 beaverWarrior
+  , _deck = []
+            ++ replicate 3 beaverWarrior
+            ++ replicate 3 darkMagician
   }
 
 data ChooseMoveHandler

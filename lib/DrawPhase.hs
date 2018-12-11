@@ -20,14 +20,13 @@ import           Log
 import           Mechanics
 import           Move
 import           Phase
-import           Player
 import           Prelude     hiding (log)
 import           Utils
 import           Victory
 
 validMoves :: ( GameEffects e ) => Eff e [Move 'Draw]
 validMoves = do
-  getLensed (currentPlayer . hasDrawnCard) >>= \case
+  getLensed L.currentPlayerHasDrawnCard >>= \case
     True ->
       return [ Move.EndDrawPhase ]
     False ->

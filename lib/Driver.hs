@@ -10,11 +10,13 @@ module Driver (
   ) where
 
 import Control.Eff               (Eff, Member)
+import Control.Eff.Fresh         (runFresh')
 import Control.Eff.Reader.Strict (runReader)
 import Control.Eff.State.Strict  (evalState)
 import Control.Eff.Writer.Strict (runMonoidWriter)
 import Control.Monad.Loops       (untilJust)
 
+import BattlePhase
 import ChooseMove
 import Configuration
 import DrawPhase
@@ -32,6 +34,7 @@ import Victory
 runPhase :: ( GameEffects e ) => Eff e (Maybe Victory)
 runPhase = do
   getLensed phase >>= \case
+    Battle -> battlePhase
     Draw   -> drawPhase
     End    -> endPhase
     Main   -> mainPhase
@@ -56,4 +59,4 @@ runDuel duelist1 duelist2 =
   player1 <- makePlayer duelist1
   player2 <- makePlayer duelist2
   let initialState = makeDuel player1 player2
-  evalState initialState $ runMonoidWriter duel
+  evalState initialState $ runMonoidWriter $ runFresh' 0 duel

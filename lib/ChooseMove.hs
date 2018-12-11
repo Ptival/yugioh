@@ -40,10 +40,10 @@ instance Exception Impossible
 
 runChooseMoveIO :: (forall b. ChooseMove b -> IO b) -> Eff '[ChooseMove] a -> IO a
 runChooseMoveIO _           (Val x) = return x
-runChooseMoveIO howToHandle (E u q) = case decomp u of
+runChooseMoveIO howToHandle (E u q) = case decomp q of
      Right command -> do
        chosenMove <- howToHandle command
-       runChooseMoveIO howToHandle (q ^$ chosenMove)
+       runChooseMoveIO howToHandle (u ^$ chosenMove)
      Left _ -> throwIO Impossible
 
 handleChooseMoveIO :: ChooseMove a -> IO a

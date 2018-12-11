@@ -22,29 +22,36 @@ import Data.String.Interpolate (i)
 
 import Card
 import In
-import Mat
 import Phase
 import Position
 import Space
-import Zipper
 
 data Move (phase :: Phase) where
-  DrawCard     :: In phase '[ 'Draw ] => Move phase
-  EndDrawPhase :: In phase '[ 'Draw ] => Move phase
-  EndMainPhase :: In phase '[ 'Main ] => Move phase
-  EndTurn ::
-    In phase '[ 'End, 'Main ] => Move phase
-  NormalSummon ::
-    In phase '[ 'Main ] =>
-    Zipper Card Card -> Position -> Move phase
-  SwitchPosition ::
-    In phase '[ 'Main ] =>
-    Zipper (Space 'IsMonsterCard) ScopedSpace -> Move phase
+  Attack         :: In phase '[ 'Battle ]              => MonsterSpace -> MonsterSpace -> Move phase
+  DirectAttack   :: In phase '[ 'Battle ]              => MonsterSpace ->                 Move phase
+  DrawCard       :: In phase '[ 'Draw ]                =>                                 Move phase
+  EndBattlePhase :: In phase '[ 'Battle ]              =>                                 Move phase
+  EndDrawPhase   :: In phase '[ 'Draw ]                =>                                 Move phase
+  EndMainPhase   :: In phase '[ 'Main ]                =>                                 Move phase
+  EndTurn        :: In phase '[ 'Battle, 'End, 'Main ] =>                                 Move phase
+  NormalSummon   :: In phase '[ 'Main ]                => Card         -> Position     -> Move phase
+  SwitchPosition :: In phase '[ 'Main ]                => MonsterSpace ->                 Move phase
 
 display :: Move p -> String
 display = \case
 
+  Move.Attack sourceSpace targetSpace ->
+    let source = Space.displaySpace sourceSpace in
+    let target = Space.displaySpace targetSpace in
+    [i|#{source} attacks #{target}|]
+
+  DirectAttack sourceSpace ->
+    let source = Space.displaySpace sourceSpace in
+    [i|#{source} directly attacks|]
+
   DrawCard -> "Draw card"
+
+  EndBattlePhase -> "End battle phase"
 
   EndDrawPhase -> "End draw phase"
 
@@ -52,12 +59,12 @@ display = \case
 
   EndTurn -> "End turn"
 
-  NormalSummon zipper position ->
-    let m = Card.display $ view cursor zipper in
+  NormalSummon card position ->
+    let m = Card.display card in
     let p = Position.display position in
     [i|Normal summon #{m} in #{p}|]
 
-  SwitchPosition zipper ->
-    let c = Space.displaySpace $ view cursor zipper in
-    let p = Position.display $ view (cursor . monsterPosition) zipper in
+  SwitchPosition space ->
+    let c = Space.displaySpace space in
+    let p = Position.display $ view monsterPosition space in
     [i|Switch #{c} to #{p}|]

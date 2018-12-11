@@ -9,8 +9,15 @@ module Lenses (
   currentPlayerHasDrawnCard,
   currentPlayerHasNormalSummoned,
   currentPlayerMainMonsterZone,
+  currentPlayerLifePoints,
   currentPlayerMat,
   otherPlayer,
+  otherPlayerDeck,
+  otherPlayerHand,
+  otherPlayerHasDrawnCard,
+  otherPlayerHasNormalSummoned,
+  otherPlayerLifePoints,
+  otherPlayerMainMonsterZone,
   otherPlayerMat,
   playerDeck,
   playerHand,
@@ -37,11 +44,32 @@ currentPlayerHasDrawnCard = currentPlayer . hasDrawnCard
 currentPlayerHasNormalSummoned :: Lens' Duel Bool
 currentPlayerHasNormalSummoned = currentPlayer . hasNormalSummoned
 
+currentPlayerLifePoints :: Lens' Duel Int
+currentPlayerLifePoints = currentPlayer . lifePoints
+
 currentPlayerMainMonsterZone :: Lens' Duel [ScopedSpace]
 currentPlayerMainMonsterZone = currentPlayerMat . mainMonsterZone
 
 currentPlayerMat :: Lens' Duel Mat
 currentPlayerMat = currentPlayer . mat
+
+otherPlayerDeck :: Lens' Duel Deck
+otherPlayerDeck = otherPlayerMat . deck
+
+otherPlayerHand :: Lens' Duel Hand
+otherPlayerHand = otherPlayer . hand
+
+otherPlayerHasDrawnCard :: Lens' Duel Bool
+otherPlayerHasDrawnCard = otherPlayer . hasDrawnCard
+
+otherPlayerHasNormalSummoned :: Lens' Duel Bool
+otherPlayerHasNormalSummoned = otherPlayer . hasNormalSummoned
+
+otherPlayerLifePoints :: Lens' Duel Int
+otherPlayerLifePoints = currentPlayer . lifePoints
+
+otherPlayerMainMonsterZone :: Lens' Duel [ScopedSpace]
+otherPlayerMainMonsterZone = otherPlayerMat . mainMonsterZone
 
 otherPlayerMat :: Lens' Duel Mat
 otherPlayerMat = otherPlayer . mat

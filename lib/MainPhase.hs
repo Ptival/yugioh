@@ -9,23 +9,23 @@ module MainPhase (
   mainPhase,
   ) where
 
-import           Control.Eff
-import           Control.Lens
-import           Data.List
+import           Control.Eff     (Eff)
+import           Control.Lens    (view)
+import           Data.List       (delete, findIndex)
+import           Data.List.Index (modifyAt)
 
 import           Card
 import           EndPhase
 import           GameEffects
-import qualified Lenses       as L
+import qualified Lenses          as L
 import           Log
-import           Mat
 import           Move
 import           Phase
-import           Prelude      hiding (log)
+import           Position
+import           Prelude         hiding (log)
 import           Space
 import           Utils
 import           Victory
-import           Zipper
 
 validMoves :: ( GameEffects e ) => Eff e [Move 'Main]
 validMoves = do
@@ -36,23 +36,21 @@ validMoves = do
   let normalSummonMoves =
         if not currentPlayerHasNormalSummoned
            && any isEmpty currentPlayerMainMonsterZone
-        then [ NormalSummon zipper position
-             | zipper <- allZippers currentPlayerHand
-             , let monster = view cursor zipper
-             , view level monster <= 4
-             , position <- [ Attack, FaceDownDefense ]
+        then [ NormalSummon card position
+             | card <- currentPlayerHand
+             , view level card <= 4
+             , position <- [ Position.Attack, FaceDownDefense ]
              ]
         else []
 
   let switchPositionMoves =
-        [ SwitchPosition zipper
-        | zipper <- monsterZippers currentPlayerMainMonsterZone
-        , let monster = view cursor zipper
+        [ SwitchPosition monster
+        | monster <- monsterSpaces currentPlayerMainMonsterZone
         , not $ view hasSwitchedPosition monster
         ]
 
   return $
-    [ Move.EndMainPhase ]
+    [ Move.EndMainPhase, Move.EndTurn ]
     ++ normalSummonMoves
     ++ switchPositionMoves
 
@@ -60,39 +58,43 @@ mainPhase :: ( GameEffects e ) => Eff e (Maybe Victory)
 mainPhase = validMoves >>= GameEffects.chooseMove >>= \case
 
   Move.EndMainPhase -> do
-    setLensed L.phase End
+    setLensed L.phase Battle
     log Log.EndMainPhase
     return Nothing
 
   Move.EndTurn -> endTurn
 
-  Move.NormalSummon handZipper position -> do
+  Move.NormalSummon card position -> do
     currentPlayer                <- getLensed L.currentPlayer
     currentPlayerMainMonsterZone <- getLensed L.currentPlayerMainMonsterZone
 
-    let card           = view cursor handZipper
-    let cardToSummon   = summonMonster card position
-    let restOfHand     = toListWithCursorDeleted handZipper
-    let summonZipper   =
-          case anyEmptyZipper currentPlayerMainMonsterZone of
-          Nothing     -> error "Tried to normal summon, but no empty space"
-          Just zipper -> zipper
-    let summonedZipper = set cursor cardToSummon summonZipper
-
-    setLensed L.currentPlayerMainMonsterZone   $ monsterZipperToList summonedZipper
-    setLensed L.currentPlayerHand              $ restOfHand
+    overLensed L.currentPlayerHand $ delete card
+    monsterSpace <- summonMonster card position
+    case findIndex isEmpty currentPlayerMainMonsterZone of
+      Nothing -> fail "Could not find a space on the mat to summon the card"
+      Just index -> do
+        overLensed L.currentPlayerMainMonsterZone
+          $ modifyAt index
+          $ const $ ScopedSpace monsterSpace
+        log $ NormalSummoned currentPlayer monsterSpace index
     setLensed L.currentPlayerHasNormalSummoned $ True
 
-    log $ NormalSummoned currentPlayer summonedZipper
     return Nothing
 
-  Move.SwitchPosition monsterZipper -> do
+  Move.SwitchPosition monsterSpace -> do
     currentPlayer                <- getLensed L.currentPlayer
+    currentPlayerMainMonsterZone <- getLensed L.currentPlayerMainMonsterZone
 
-    let monsterZipper'     = over cursor switchPosition monsterZipper
-    let newMainMonsterZone = monsterZipperToList monsterZipper'
+    let targetIdentifier = view identifier monsterSpace
 
-    setLensed L.currentPlayerMainMonsterZone newMainMonsterZone
-
-    log $ SwitchedPosition currentPlayer monsterZipper'
+    let isTarget s       = view identifier s == targetIdentifier
+    let monsters         = filterMonsterCards currentPlayerMainMonsterZone
+    case findIndex isTarget monsters of
+      Nothing -> fail "Could not find the monster whose position to switch"
+      Just index -> do
+        overLensed L.currentPlayerMainMonsterZone
+          $ modifyAt index (whenMonster switchPosition)
+        newMainMonsterZone <- getLensed L.currentPlayerMainMonsterZone
+        let newMonsterSpace = filterMonsterCards newMainMonsterZone !! index
+        log $ SwitchedPosition currentPlayer newMonsterSpace index
     return Nothing

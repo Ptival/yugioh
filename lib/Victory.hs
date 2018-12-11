@@ -18,12 +18,13 @@ import Data.String.Interpolate
 import Player
 
 data VictoryCondition
-  = OpponentRanOutOfCards
+  = OpponentLPReducedToZero
+  | OpponentRanOutOfCards
 
 displayVictoryCondition :: VictoryCondition -> String
 displayVictoryCondition = \case
-
-  OpponentRanOutOfCards -> "Opponent ran out of cards"
+  OpponentLPReducedToZero -> "Opponent life points reduced to zero"
+  OpponentRanOutOfCards   -> "Opponent ran out of cards"
 
 data Victory = Victory
   { _winner           :: Player

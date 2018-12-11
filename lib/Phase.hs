@@ -10,7 +10,8 @@ module Phase
 import GHC.Generics
 
 data Phase
-  = Draw
+  = Battle
+  | Draw
   | End
   | Main
   deriving (Eq, Generic, Show)

@@ -13,7 +13,6 @@ module Mat (
   Graveyard,
   MainMonsterZone,
   Mat(..),
-  Position(..),
   Space(..),
   deck,
   Mat.display,
@@ -31,7 +30,6 @@ import Data.String.Interpolate
 
 import Card
 import Configuration
-import Position
 import Space
 import Utils
 
