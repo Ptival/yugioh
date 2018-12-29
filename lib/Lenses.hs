@@ -4,78 +4,43 @@
 
 module Lenses (
   currentPlayer,
-  currentPlayerDeck,
-  currentPlayerHand,
-  currentPlayerHasDrawnCard,
-  currentPlayerHasNormalSummoned,
-  currentPlayerMainMonsterZone,
-  currentPlayerLifePoints,
-  currentPlayerMat,
+  deck,
+  hand,
+  hasDrawnCard,
+  hasNormalSummoned,
+  hasSwitchedPosition,
+  lifePoints,
+  mainMonsterZone,
+  mat,
   otherPlayer,
-  otherPlayerDeck,
-  otherPlayerHand,
-  otherPlayerHasDrawnCard,
-  otherPlayerHasNormalSummoned,
-  otherPlayerLifePoints,
-  otherPlayerMainMonsterZone,
-  otherPlayerMat,
-  playerDeck,
-  playerHand,
   phase,
+  turn,
   ) where
 
-import Control.Lens
+import           Control.Lens (Lens')
 
-import Card
-import Duel
-import Mat
-import Player
-import Space
+import           Duel
+import qualified Mat
+import qualified Player
+import           Space
 
-currentPlayerDeck :: Lens' Duel Deck
-currentPlayerDeck = currentPlayerMat . deck
+deck :: PlayerLens -> Lens' Duel Mat.Deck
+deck player = player . Player.mat . Mat.deck
 
-currentPlayerHand :: Lens' Duel Hand
-currentPlayerHand = currentPlayer . hand
+hand :: PlayerLens -> Lens' Duel Player.Hand
+hand player = player . Player.hand
 
-currentPlayerHasDrawnCard :: Lens' Duel Bool
-currentPlayerHasDrawnCard = currentPlayer . hasDrawnCard
+hasDrawnCard :: PlayerLens -> Lens' Duel Bool
+hasDrawnCard player = player . Player.hasDrawnCard
 
-currentPlayerHasNormalSummoned :: Lens' Duel Bool
-currentPlayerHasNormalSummoned = currentPlayer . hasNormalSummoned
+hasNormalSummoned :: PlayerLens -> Lens' Duel Bool
+hasNormalSummoned player = player . Player.hasNormalSummoned
 
-currentPlayerLifePoints :: Lens' Duel Int
-currentPlayerLifePoints = currentPlayer . lifePoints
+lifePoints :: PlayerLens -> Lens' Duel Int
+lifePoints player = player . Player.lifePoints
 
-currentPlayerMainMonsterZone :: Lens' Duel [ScopedSpace]
-currentPlayerMainMonsterZone = currentPlayerMat . mainMonsterZone
+mainMonsterZone :: PlayerLens -> Lens' Duel [ScopedSpace]
+mainMonsterZone player = Lenses.mat player . Mat.mainMonsterZone
 
-currentPlayerMat :: Lens' Duel Mat
-currentPlayerMat = currentPlayer . mat
-
-otherPlayerDeck :: Lens' Duel Deck
-otherPlayerDeck = otherPlayerMat . deck
-
-otherPlayerHand :: Lens' Duel Hand
-otherPlayerHand = otherPlayer . hand
-
-otherPlayerHasDrawnCard :: Lens' Duel Bool
-otherPlayerHasDrawnCard = otherPlayer . hasDrawnCard
-
-otherPlayerHasNormalSummoned :: Lens' Duel Bool
-otherPlayerHasNormalSummoned = otherPlayer . hasNormalSummoned
-
-otherPlayerLifePoints :: Lens' Duel Int
-otherPlayerLifePoints = currentPlayer . lifePoints
-
-otherPlayerMainMonsterZone :: Lens' Duel [ScopedSpace]
-otherPlayerMainMonsterZone = otherPlayerMat . mainMonsterZone
-
-otherPlayerMat :: Lens' Duel Mat
-otherPlayerMat = otherPlayer . mat
-
-playerDeck :: Lens' Duel Player -> Lens' Duel [Card]
-playerDeck playerLens = playerLens . mat . Mat.deck
-
-playerHand :: Lens' Duel Player -> Lens' Duel [Card]
-playerHand playerLens = playerLens . hand
+mat :: PlayerLens -> Lens' Duel Mat.Mat
+mat player = player . Player.mat

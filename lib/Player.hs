@@ -15,7 +15,9 @@ module Player (
   hand,
   hasDrawnCard,
   hasNormalSummoned,
+  identifier,
   inflictDamage,
+  isSamePlayer,
   lifePoints,
   makePlayer,
   mat,
@@ -23,10 +25,13 @@ module Player (
   Player.prepareForNewTurn,
   ) where
 
-import Control.Eff
-import Control.Eff.Reader.Strict
-import Control.Lens
-import Data.String.Interpolate
+import Control.Eff               (Eff, Member)
+import Control.Eff.Fresh         (Fresh, fresh)
+import Control.Eff.Reader.Strict (Reader, ask)
+import Control.Lens              (makeLenses, over, set, view)
+import Data.Function             (on)
+import Data.String.Interpolate   (i)
+
 import Card
 import Configuration
 import Duelist
@@ -40,6 +45,7 @@ data Player = Player
   , _hand              :: Hand
   , _hasDrawnCard      :: Bool
   , _hasNormalSummoned :: Bool
+  , _identifier        :: Int
   , _lifePoints        :: Int
   , _mat               :: Mat.Mat
   }
@@ -47,16 +53,19 @@ data Player = Player
 makeLenses ''Player
 
 makePlayer ::
-  ( Member (Reader Configuration) e ) =>
+  Member Fresh                  e =>
+  Member (Reader Configuration) e =>
   Duelist -> Eff e Player
 makePlayer duelist = do
-  lp <- view originalLifePoints <$> ask
+  ident     <- fresh
+  lp        <- view originalLifePoints <$> ask
   playerMat <- Mat.makeMat $ view Duelist.deck duelist
   return $ Player
     { _name              = view Duelist.name duelist
     , _hand              = []
     , _hasDrawnCard      = False
     , _hasNormalSummoned = False
+    , _identifier        = ident
     , _lifePoints        = lp
     , _mat               = playerMat
     }
@@ -78,3 +87,6 @@ TEST
 
 inflictDamage :: Int -> Player -> Player
 inflictDamage damage = over lifePoints (\ lp -> max 0 (lp - damage))
+
+isSamePlayer :: Player -> Player -> Bool
+isSamePlayer = (==) `on` view identifier

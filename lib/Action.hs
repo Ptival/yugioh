@@ -17,7 +17,7 @@
 -- {-# LANGUAGE TypeOperators #-}
 -- {-# LANGUAGE UndecidableInstances #-}
 
-module Whatever where
+module Action where
 
 import GHC.Exts
 import GHC.TypeLits
@@ -49,5 +49,4 @@ data Action (configuration :: Configuration) where
 
 exhaustive :: Action 'A -> ()
 exhaustive Action1 = ()
-exhaustive Action2 = ()
 exhaustive Action3 = ()

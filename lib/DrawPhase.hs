@@ -13,41 +13,29 @@ module DrawPhase (
 
 import           Control.Eff
 
-import           Duel
-import           GameEffects
 import qualified Lenses      as L
-import           Log
-import           Mechanics
 import           Move
+import           Operation
 import           Phase
 import           Prelude     hiding (log)
-import           Utils
 import           Victory
 
-validMoves :: ( GameEffects e ) => Eff e [Move 'Draw]
+validMoves ::
+  Operations e =>
+  Eff e [Move 'Draw]
 validMoves = do
-  getLensed L.currentPlayerHasDrawnCard >>= \case
-    True ->
-      return [ Move.EndDrawPhase ]
-    False ->
-      return [ DrawCard ]
+  getHasDrawnCard L.currentPlayer >>= \case
+    True  -> return [ Move.EndDrawPhase ]
+    False -> return [ DrawCard ]
 
-drawPhase :: ( GameEffects e ) => Eff e (Maybe Victory)
-drawPhase = validMoves >>= GameEffects.chooseMove >>= \case
+drawPhase ::
+  Operations e =>
+  Eff e (Maybe Victory)
+drawPhase = validMoves >>= chooseMove >>= \case
 
   DrawCard -> do
-    currentPlayerDeck <- getLensed L.currentPlayerDeck
-    if length currentPlayerDeck == 0
-      then do
-      winner <- getLensed otherPlayer
-      return $ Just $ makeVictory winner OpponentRanOutOfCards
-      else do
-      card <- drawCard currentPlayer
-      addCardToHand currentPlayer card
-      setLensed L.currentPlayerHasDrawnCard True
-      drawPhase
+    drawCard L.currentPlayer
 
   Move.EndDrawPhase -> do
-    setLensed phase Main
-    log Log.EndDrawPhase
+    enterMainPhase
     return Nothing

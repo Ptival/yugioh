@@ -1,7 +1,7 @@
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE Rank2Types #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 -- | Run our simulator!
 
@@ -9,13 +9,15 @@ module Main (
   main,
   ) where
 
-import Control.Monad (forM_)
+import Control.Eff              (Eff, Lifted, runLift)
+import Control.Monad            (forM_)
 
 import Card.BeaverWarrior
 import Card.BlueEyesWhiteDragon
+import Card.CurseOfDragon
 import Card.DarkMagician
 import Card.SaggiTheDarkClown
-import ChooseMove
+import ChooseOption
 import Driver
 import Duelist
 import Log
@@ -35,17 +37,20 @@ yamiYugi = Duelist
   { _name = "Yami Yugi"
   , _deck = []
             ++ replicate 3 beaverWarrior
+            ++ replicate 3 curseOfDragon
             ++ replicate 3 darkMagician
   }
 
-data ChooseMoveHandler
+data ChooseOptionHandler
   = Manually
   | Randomly
 
-getChooseMoveHandler :: ChooseMoveHandler -> (forall a. ChooseMove a -> IO a)
-getChooseMoveHandler = \case
-  Manually -> handleChooseMoveIO
-  Randomly -> handleChooseMoveRandom
+getChooseOptionHandler ::
+  Lifted IO e =>
+  ChooseOptionHandler -> (forall a. ChooseOption a -> Eff e a)
+getChooseOptionHandler = \case
+  Manually -> handleChooseOptionIO
+  Randomly -> handleChooseOptionRandom
 
 main :: IO ()
 main = do
@@ -56,7 +61,9 @@ main = do
         , ("Randomly (computer picks random moves for both players)", Randomly)
         ]
   chooseMoveHandlerDescriptor <- promptForOption prompt options
-  let chooseMoveHandler = getChooseMoveHandler chooseMoveHandlerDescriptor
-  (victory, duelLog) <- runChooseMoveIO chooseMoveHandler $ runDuel setoKaiba yamiYugi
+  let chooseMoveHandler = getChooseOptionHandler chooseMoveHandlerDescriptor
+  (victory, duelLog) <- runLift
+                        $ handleChooseOption chooseMoveHandler
+                        $ runDuel setoKaiba yamiYugi
   forM_ duelLog (putStrLn . Log.display)
   putStrLn $ Victory.display victory

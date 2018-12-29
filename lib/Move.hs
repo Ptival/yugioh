@@ -27,15 +27,36 @@ import Position
 import Space
 
 data Move (phase :: Phase) where
-  Attack         :: In phase '[ 'Battle ]              => MonsterSpace -> MonsterSpace -> Move phase
-  DirectAttack   :: In phase '[ 'Battle ]              => MonsterSpace ->                 Move phase
-  DrawCard       :: In phase '[ 'Draw ]                =>                                 Move phase
-  EndBattlePhase :: In phase '[ 'Battle ]              =>                                 Move phase
-  EndDrawPhase   :: In phase '[ 'Draw ]                =>                                 Move phase
-  EndMainPhase   :: In phase '[ 'Main ]                =>                                 Move phase
-  EndTurn        :: In phase '[ 'Battle, 'End, 'Main ] =>                                 Move phase
-  NormalSummon   :: In phase '[ 'Main ]                => Card         -> Position     -> Move phase
-  SwitchPosition :: In phase '[ 'Main ]                => MonsterSpace ->                 Move phase
+  Attack ::
+    In phase '[ 'Battle ] =>
+    MonsterSpace -> MonsterSpace -> Move phase
+  DirectAttack ::
+    In phase '[ 'Battle ] =>
+    MonsterSpace -> Move phase
+  DrawCard ::
+    In phase '[ 'Draw ] =>
+    Move phase
+  EndBattlePhase ::
+    In phase '[ 'Battle ] =>
+    Move phase
+  EndDrawPhase ::
+    In phase '[ 'Draw ] =>
+    Move phase
+  EndMainPhase ::
+    In phase '[ 'Main ] =>
+    Move phase
+  EndTurn ::
+    In phase '[ 'Battle, 'End, 'Main ] =>
+    Move phase
+  NormalSummon ::
+    In phase '[ 'Main ] =>
+    Card -> Position -> Move phase
+  TributeSummon ::
+    In phase '[ 'Main ] =>
+    Card -> Position -> Move phase
+  SwitchPosition ::
+    In phase '[ 'Main ] =>
+    MonsterSpace -> Move phase
 
 display :: Move p -> String
 display = \case
@@ -63,6 +84,11 @@ display = \case
     let m = Card.display card in
     let p = Position.display position in
     [i|Normal summon #{m} in #{p}|]
+
+  TributeSummon card position ->
+    let m = Card.display card in
+    let p = Position.display position in
+    [i|Tribute summon #{m} in #{p}|]
 
   SwitchPosition space ->
     let c = Space.displaySpace space in

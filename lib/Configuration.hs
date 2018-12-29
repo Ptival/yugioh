@@ -15,6 +15,7 @@ module Configuration (
   mainMonsterZoneSize,
   originalLifePoints,
   spellTrapPendulumZoneSize,
+  startingHandSize,
   testingConfiguration,
   tradingCardGameConfiguration,
   ) where
@@ -30,6 +31,7 @@ data Configuration = Configuration
   , _mainMonsterZoneSize       :: Int
   , _originalLifePoints        :: Int
   , _spellTrapPendulumZoneSize :: Int
+  , _startingHandSize          :: Int
   }
   deriving (Eq, Generic, Show)
 
@@ -42,6 +44,7 @@ duelLinksConfiguration = Configuration
   , _mainMonsterZoneSize       = 3
   , _originalLifePoints        = 4000
   , _spellTrapPendulumZoneSize = 3
+  , _startingHandSize          = 4
   }
 
 testingConfiguration :: Configuration
@@ -51,6 +54,7 @@ testingConfiguration = Configuration
   , _mainMonsterZoneSize       = 3
   , _originalLifePoints        = 4000
   , _spellTrapPendulumZoneSize = 3
+  , _startingHandSize          = 4
   }
 
 tradingCardGameConfiguration :: Configuration
@@ -60,6 +64,7 @@ tradingCardGameConfiguration = Configuration
   , _mainMonsterZoneSize       = 5
   , _originalLifePoints        = 8000
   , _spellTrapPendulumZoneSize = 5
+  , _startingHandSize          = 5
   }
 
 askConfiguration ::

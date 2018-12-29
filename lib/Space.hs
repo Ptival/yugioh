@@ -35,8 +35,10 @@ module Space (
   isEmpty,
   isInAttackPosition,
   isInDefensePosition,
+  isInFaceDownDefensePosition,
   isMonsterInAttackPosition,
   isMonsterInDefensePosition,
+  isSameMonster,
   monsterCard,
   monsterPosition,
   monsterSpaces,
@@ -50,6 +52,7 @@ module Space (
 import Control.Eff             (Eff, Member)
 import Control.Eff.Fresh       (Fresh, fresh)
 import Control.Lens            (over, Lens', lens, set, view)
+import Data.Function           (on)
 import Data.Maybe              (maybeToList)
 import Data.String.Interpolate (i)
 import GHC.Generics            (Generic)
@@ -160,6 +163,9 @@ isInAttackPosition (MonsterCard {..}) = _monsterPosition == Attack
 isInDefensePosition :: MonsterSpace -> Bool
 isInDefensePosition (MonsterCard {..}) = isDefensePosition _monsterPosition
 
+isInFaceDownDefensePosition :: MonsterSpace -> Bool
+isInFaceDownDefensePosition (MonsterCard {..}) = isFaceDownDefensePosition _monsterPosition
+
 monsterSpaces :: [ScopedSpace] -> [MonsterSpace]
 monsterSpaces = foldr (scoped appendIfMonster) []
   where
@@ -225,3 +231,6 @@ switchPosition s = case view monsterPosition s of
   Attack          -> switchToDefensePosition s
   FaceDownDefense -> switchToAttackPosition  s
   FaceUpDefense   -> switchToAttackPosition  s
+
+isSameMonster :: MonsterSpace -> MonsterSpace -> Bool
+isSameMonster = (==) `on` (view identifier)

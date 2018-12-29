@@ -14,6 +14,7 @@ module Utils (
   askLensed,
   compose,
   displayList,
+  getALensed,
   getLensed,
   Utils.log,
   mapWithIndex,
@@ -27,7 +28,7 @@ import Control.Eff.Reader.Strict (Reader, ask)
 import Control.Eff.State.Strict  (State, get, modify)
 import Control.Eff.Writer.Strict (Writer, tell)
 import Control.Exception         (Exception, throwIO)
-import Control.Lens              (ASetter, Getting, over, set, view)
+import Control.Lens              (ALens', ASetter, Getting, cloneLens, over, set, view)
 import Control.Monad             (when, foldM_)
 import Control.Monad.Loops       (untilJust)
 import Data.List                 (foldl', intercalate)
@@ -47,6 +48,9 @@ displayList displayElement = intercalate "\n" . map displayElement
 
 askLensed :: Member (Reader s) r => Getting b s b -> Eff r b
 askLensed l = view l <$> ask
+
+getALensed :: Member (State s) r => ALens' s b -> Eff r b
+getALensed l = view (cloneLens l) <$> get
 
 getLensed :: Member (State s) r => Getting b s b -> Eff r b
 getLensed l = view l <$> get

@@ -22,8 +22,7 @@ import Space
 type Log = [Entry]
 
 data Entry
-  = AddedCardToHand  Player Card
-  | Attacked         Player MonsterSpace Player MonsterSpace
+  = Attacked         Player MonsterSpace Player MonsterSpace
   | DamageInflicted  Player Int
   | Destroyed        Player MonsterSpace
   | DirectAttacked   Player MonsterSpace Player
@@ -31,16 +30,15 @@ data Entry
   | EndBattlePhase
   | EndDrawPhase
   | EndMainPhase
-  | EndTurn
+  | Flipped          Player MonsterSpace
   | NormalSummoned   Player MonsterSpace Int
+  | TributeSummoned  Player MonsterSpace Int
   | SentToGraveyard  Player Card
   | SwitchedPosition Player MonsterSpace Int
+  | Turn             Int    Player       Player
 
 display :: Entry -> String
 display = \case
-
-  AddedCardToHand player card ->
-    [i|#{view Player.name player} added card #{Card.display card} to their hand|]
 
   Attacked sourcePlayer sourceMonster targetPlayer targetMonster ->
     let sp  = view Player.name sourcePlayer in
@@ -62,7 +60,7 @@ display = \case
     [i|#{sp}'s #{sm} attacked #{tp} directly|]
 
   DrewCard player card ->
-    [i|#{view Player.name player} drew card #{Card.display card}|]
+    [i|#{view Player.name player} drew #{Card.display card}|]
 
   EndBattlePhase -> "Battle phase ended"
 
@@ -70,13 +68,22 @@ display = \case
 
   EndMainPhase -> "Main phase ended"
 
-  EndTurn -> "Turn ended"
+  Flipped player monster ->
+    let pl =                view Player.name player  in
+    let m  = Card.display $ view monsterCard monster in
+    [i|#{pl}'s #{m} got flipped|]
 
-  NormalSummoned player space location ->
-    let pl      = view Player.name player in
-    let monster = Card.display $ view monsterCard space in
-    let pos     = Position.display $ view monsterPosition space in
-    [i|#{pl} normal summoned #{monster} (at #{location}) in #{pos}|]
+  NormalSummoned player monster location ->
+    let pl  =                    view Player.name     player  in
+    let m   =     Card.display $ view monsterCard     monster in
+    let pos = Position.display $ view monsterPosition monster in
+    [i|#{pl} normal summoned #{m} (at #{location}) in #{pos}|]
+
+  TributeSummoned player monster location ->
+    let pl  =                    view Player.name     player  in
+    let m   =     Card.display $ view monsterCard     monster in
+    let pos = Position.display $ view monsterPosition monster in
+    [i|#{pl} tribute summoned #{m} (at #{location}) in #{pos}|]
 
   SentToGraveyard player card ->
     let pl = view Player.name player in
@@ -88,3 +95,10 @@ display = \case
     let monster = Card.display $ view monsterCard space in
     let pos     = Position.display $ view monsterPosition space in
     [i|#{pl} switched #{monster} (at #{location}) to #{pos}|]
+
+  Turn turn player1 player2 ->
+    let pl1   = view Player.name       player1 in
+    let pl2   = view Player.name       player2 in
+    let pl1lp = view Player.lifePoints player1 in
+    let pl2lp = view Player.lifePoints player2 in
+    [i|TURN #{turn} (#{pl1}: #{pl1lp} LP) (#{pl2}: #{pl2lp} LP)|]

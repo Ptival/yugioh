@@ -9,6 +9,7 @@ module Position (
   display,
   flip,
   isDefensePosition,
+  isFaceDownDefensePosition,
   ) where
 
 import GHC.Generics
@@ -34,6 +35,12 @@ flip FaceUpDefense   = FaceUpDefense
 
 isDefensePosition :: Position -> Bool
 isDefensePosition = \case
+  Attack          -> False
+  FaceDownDefense -> True
+  FaceUpDefense   -> True
+
+isFaceDownDefensePosition :: Position -> Bool
+isFaceDownDefensePosition = \case
   Attack          -> False
   FaceDownDefense -> True
   FaceUpDefense   -> True

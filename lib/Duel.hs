@@ -13,6 +13,7 @@
 
 module Duel (
   Duel(..),
+  PlayerLens,
   currentPlayer,
   otherPlayer,
   phase,
@@ -30,5 +31,7 @@ data Duel = Duel
   , _currentPlayer :: Player
   , _otherPlayer   :: Player
   }
+
+type PlayerLens = Lens' Duel Player
 
 makeLenses ''Duel

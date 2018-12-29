@@ -11,31 +11,35 @@ module MainPhase (
 
 import           Control.Eff     (Eff)
 import           Control.Lens    (view)
-import           Data.List       (delete, findIndex)
-import           Data.List.Index (modifyAt)
+import           Control.Monad   (replicateM_)
 
 import           Card
-import           EndPhase
-import           GameEffects
 import qualified Lenses          as L
-import           Log
 import           Move
+import           Operation
 import           Phase
 import           Position
 import           Prelude         hiding (log)
-import           Space
-import           Utils
+import qualified Space           as S
 import           Victory
 
-validMoves :: ( GameEffects e ) => Eff e [Move 'Main]
+tributeFor :: Int -> Int
+tributeFor n | n >= 5 && n <= 6 = 1
+             | n >= 7 && n <= 8 = 2
+             | n >= 9           = 3
+             | otherwise        = error "Only monsters above level 4 can be tribute summoned"
+
+validMoves ::
+  Operations e =>
+  Eff e [Move 'Main]
 validMoves = do
-  currentPlayerHasNormalSummoned <- getLensed L.currentPlayerHasNormalSummoned
-  currentPlayerMainMonsterZone   <- getLensed L.currentPlayerMainMonsterZone
-  currentPlayerHand              <- getLensed L.currentPlayerHand
+  currentPlayerHand              <- getHand              L.currentPlayer
+  currentPlayerHasNormalSummoned <- getHasNormalSummoned L.currentPlayer
+  currentPlayerMainMonsterZone   <- getMainMonsterZone   L.currentPlayer
 
   let normalSummonMoves =
         if not currentPlayerHasNormalSummoned
-           && any isEmpty currentPlayerMainMonsterZone
+           && any S.isEmpty currentPlayerMainMonsterZone
         then [ NormalSummon card position
              | card <- currentPlayerHand
              , view level card <= 4
@@ -43,58 +47,53 @@ validMoves = do
              ]
         else []
 
+  let tributeSummonMoves =
+        if not currentPlayerHasNormalSummoned
+        then [ TributeSummon card position
+             | card <- currentPlayerHand
+             , let cardLevel = view level card
+             , cardLevel > 4
+             , length (S.monsterSpaces currentPlayerMainMonsterZone) >= tributeFor cardLevel
+             , position <- [ Position.Attack, FaceDownDefense ]
+             ]
+        else []
+
   let switchPositionMoves =
         [ SwitchPosition monster
-        | monster <- monsterSpaces currentPlayerMainMonsterZone
-        , not $ view hasSwitchedPosition monster
+        | monster <- S.monsterSpaces currentPlayerMainMonsterZone
+        , not $ view L.hasSwitchedPosition monster
         ]
 
   return $
     [ Move.EndMainPhase, Move.EndTurn ]
     ++ normalSummonMoves
+    ++ tributeSummonMoves
     ++ switchPositionMoves
 
-mainPhase :: ( GameEffects e ) => Eff e (Maybe Victory)
-mainPhase = validMoves >>= GameEffects.chooseMove >>= \case
+mainPhase ::
+  Operations e =>
+  Eff e (Maybe Victory)
+mainPhase = validMoves >>= chooseMove >>= \case
 
   Move.EndMainPhase -> do
-    setLensed L.phase Battle
-    log Log.EndMainPhase
+    enterBattlePhase
     return Nothing
 
-  Move.EndTurn -> endTurn
+  Move.EndTurn -> do
+    endTurn
+    return Nothing
 
   Move.NormalSummon card position -> do
-    currentPlayer                <- getLensed L.currentPlayer
-    currentPlayerMainMonsterZone <- getLensed L.currentPlayerMainMonsterZone
-
-    overLensed L.currentPlayerHand $ delete card
-    monsterSpace <- summonMonster card position
-    case findIndex isEmpty currentPlayerMainMonsterZone of
-      Nothing -> fail "Could not find a space on the mat to summon the card"
-      Just index -> do
-        overLensed L.currentPlayerMainMonsterZone
-          $ modifyAt index
-          $ const $ ScopedSpace monsterSpace
-        log $ NormalSummoned currentPlayer monsterSpace index
-    setLensed L.currentPlayerHasNormalSummoned $ True
-
+    summonMonster L.currentPlayer card position
     return Nothing
 
-  Move.SwitchPosition monsterSpace -> do
-    currentPlayer                <- getLensed L.currentPlayer
-    currentPlayerMainMonsterZone <- getLensed L.currentPlayerMainMonsterZone
+  Move.TributeSummon card position -> do
+    let cardLevel        = view level card
+    let requiredTributes = tributeFor cardLevel
+    replicateM_ requiredTributes $ tributeMonster L.currentPlayer
+    summonMonster L.currentPlayer card position
+    return Nothing
 
-    let targetIdentifier = view identifier monsterSpace
-
-    let isTarget s       = view identifier s == targetIdentifier
-    let monsters         = filterMonsterCards currentPlayerMainMonsterZone
-    case findIndex isTarget monsters of
-      Nothing -> fail "Could not find the monster whose position to switch"
-      Just index -> do
-        overLensed L.currentPlayerMainMonsterZone
-          $ modifyAt index (whenMonster switchPosition)
-        newMainMonsterZone <- getLensed L.currentPlayerMainMonsterZone
-        let newMonsterSpace = filterMonsterCards newMainMonsterZone !! index
-        log $ SwitchedPosition currentPlayer newMonsterSpace index
+  Move.SwitchPosition monster -> do
+    Operation.switchPosition L.currentPlayer monster
     return Nothing
