@@ -9,25 +9,20 @@ module MainPhase (
   mainPhase,
   ) where
 
-import           Control.Eff     (Eff)
-import           Control.Lens    (view)
-import           Control.Monad   (replicateM_)
+import           Control.Eff   (Eff)
+import           Control.Lens  (view)
+import           Control.Monad (replicateM_)
 
 import           Card
-import qualified Lenses          as L
+import           DuelHelpers
+import qualified Lenses        as L
 import           Move
 import           Operation
 import           Phase
 import           Position
-import           Prelude         hiding (log)
-import qualified Space           as S
+import           Prelude       hiding (log)
+import qualified Space         as S
 import           Victory
-
-tributeFor :: Int -> Int
-tributeFor n | n >= 5 && n <= 6 = 1
-             | n >= 7 && n <= 8 = 2
-             | n >= 9           = 3
-             | otherwise        = error "Only monsters above level 4 can be tribute summoned"
 
 validMoves ::
   Operations e =>
@@ -39,9 +34,9 @@ validMoves = do
 
   let normalSummonMoves =
         if not currentPlayerHasNormalSummoned
-           && any S.isEmpty currentPlayerMainMonsterZone
+           && Prelude.any S.isEmptyMonsterZoneSpace currentPlayerMainMonsterZone
         then [ NormalSummon card position
-             | card <- currentPlayerHand
+             | card <- filterMonsters currentPlayerHand
              , view level card <= 4
              , position <- [ Position.Attack, FaceDownDefense ]
              ]
@@ -50,7 +45,7 @@ validMoves = do
   let tributeSummonMoves =
         if not currentPlayerHasNormalSummoned
         then [ TributeSummon card position
-             | card <- currentPlayerHand
+             | card <- filterMonsters currentPlayerHand
              , let cardLevel = view level card
              , cardLevel > 4
              , length (S.monsterSpaces currentPlayerMainMonsterZone) >= tributeFor cardLevel
@@ -74,6 +69,10 @@ mainPhase ::
   Operations e =>
   Eff e (Maybe Victory)
 mainPhase = validMoves >>= chooseMove >>= \case
+
+  Move.ActivateSpell _ ->
+    error "FIXME"
+    -- return Nothing
 
   Move.EndMainPhase -> do
     enterBattlePhase

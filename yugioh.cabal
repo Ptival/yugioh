@@ -1,67 +1,85 @@
-Name:               yugioh
-Version:            0.1
-Synopsis:           Yu-Gi-Oh! simulator
-Description:        No copyright infrigement intended! :D
-License:            GPL-3
-License-file:       LICENSE
-Author:             Valentin Robert
-Maintainer:         valentin.robert.42@gmail.com
-Stability:          Experimental
-Category:           Games
-Build-type:         Simple
-Cabal-version:      >=1.22
+cabal-version: 1.12
 
-Library
-  default-language: Haskell2010
-  ghc-options:      -Wall
-  hs-source-dirs:   lib
-  build-depends:    base               >= 4.0  && < 5.0,
-                    extensible-effects >= 4.0  && < 4.1,
-                    ilist              >= 0.3  && < 0.4,
-                    interpolate        >= 0.2  && < 0.3,
-                    lens               >= 4.17 && < 4.18,
-                    monad-loops        >= 0.4  && < 0.5,
-                    random             >= 1.1  && < 1.2,
-                    random-shuffle     >= 0.0  && < 0.1
-  exposed-modules:  Card.BeaverWarrior
-                    Card.BlueEyesWhiteDragon
-                    Card.CurseOfDragon
-                    Card.DarkMagician
-                    Card.SaggiTheDarkClown
-                    ChooseOption
-                    Driver
-                    Duelist
-                    Log
-                    Utils
-                    Victory
-  other-modules:    Attribute
-                    BattlePhase
-                    Card
-                    Configuration
-                    DrawPhase
-                    Duel
-                    DuelHelpers
-                    EndPhase
-                    GameEffects
-                    In
-                    Lenses
-                    Location
-                    MainPhase
-                    Mat
-                    Move
-                    Operation
-                    Phase
-                    Player
-                    Position
-                    Space
-                    Type
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: c8d9d468969c4834c3601f99deb1315de559326d3c37c8bf801248cd28f4c873
 
-Executable yugioh
-  default-language: Haskell2010
-  ghc-options:      -Wall
-  hs-source-dirs:   exec
-  main-is:          Main.hs
+name:               yugioh
+version:            0.1.0
+author:             Valentin Robert <valentin.robert.42@gmail.com>
+maintainer:         Valentin Robert <valentin.robert.42@gmail.com>
+license:            BSD3
+license-file:       LICENSE
+build-type:         Simple
+
+library
+  exposed-modules:
+    Card
+    Card.BeaverWarrior
+    Card.BlueEyesWhiteDragon
+    Card.CurseOfDragon
+    Card.DarkMagician
+    Card.SaggiTheDarkClown
+    ChooseOption
+    Driver
+    Duelist
+    Log
+    Utils
+    Victory
+  other-modules:
+    Attribute
+    BattlePhase
+    CardEffects
+    Configuration
+    DrawPhase
+    Duel
+    DuelHelpers
+    EndPhase
+    GameEffects
+    Identifier
+    In
+    Lenses
+    Location
+    MainPhase
+    Mat
+    Move
+    Operation
+    Phase
+    Player
+    Position
+    Space
+    Type
+  hs-source-dirs:
+    lib
+  default-extensions: DeriveGeneric DuplicateRecordFields GADTs LambdaCase NamedFieldPuns RankNTypes RecordWildCards ScopedTypeVariables TypeApplications
   build-depends:
     base,
     extensible-effects,
+    ilist,
+    interpolate,
+    lens,
+    monad-loops,
+    random,
+    random-shuffle
+  default-language: Haskell2010
+
+executable yugioh
+  main-is: Main.hs
+  other-modules:
+    Paths_yugioh
+  hs-source-dirs:
+    exec
+  default-extensions: DeriveGeneric DuplicateRecordFields GADTs LambdaCase NamedFieldPuns RankNTypes RecordWildCards ScopedTypeVariables TypeApplications
+  build-depends:
+    base,
+    extensible-effects,
+    ilist,
+    interpolate,
+    lens,
+    monad-loops,
+    random,
+    random-shuffle,
     yugioh
+  default-language: Haskell2010

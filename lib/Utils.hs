@@ -90,7 +90,7 @@ promptForOption prompt options = do
       Nothing -> do
         putStrLn "[ERROR] not a number, please try again"
         return Nothing
-      Just humanNumber -> do
+      Just humanNumber ->
         if humanNumber < 0 || humanNumber > len
           then do
           putStrLn "[ERROR] number out of range, please try again"

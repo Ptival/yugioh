@@ -8,9 +8,9 @@ import Attribute
 import Card
 import Type
 
-saggiTheDarkClown :: Card
-saggiTheDarkClown = Card
-  { _name        = "Saggi the Dark Clown"
+saggiTheDarkClown :: MonsterCard
+saggiTheDarkClown = Monster
+  { _monsterName = "Saggi the Dark Clown"
   , _attribute   = Dark
   , _level       = 3
   , _monsterType = Spellcaster

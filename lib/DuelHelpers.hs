@@ -5,7 +5,8 @@
 
 module DuelHelpers
   ( opponentOf
-  , overMonster
+  , DuelHelpers.overMonster
+  , tributeFor
   ) where
 
 import           Control.Eff  (Eff)
@@ -41,4 +42,10 @@ overMonster playerLens monster f = do
         if isSameMonster candidate monster
         then f candidate
         else candidate
-  overLensed (playerLens . mat . mainMonsterZone) $ map (whenMonster update)
+  overLensed (playerLens . mat . mainMonsterZone) $ map (Space.updateMonster update)
+
+tributeFor :: Int -> Int
+tributeFor n | n >= 5 && n <= 6 = 1
+             | n >= 7 && n <= 8 = 2
+             | n >= 9           = 3
+             | otherwise        = error "Only monsters above level 4 can be tribute summoned"

@@ -26,14 +26,14 @@ data Entry
   | DamageInflicted  Player Int
   | Destroyed        Player MonsterSpace
   | DirectAttacked   Player MonsterSpace Player
-  | DrewCard         Player Card
+  | DrewCard         Player AnyCard
   | EndBattlePhase
   | EndDrawPhase
   | EndMainPhase
   | Flipped          Player MonsterSpace
   | NormalSummoned   Player MonsterSpace Int
   | TributeSummoned  Player MonsterSpace Int
-  | SentToGraveyard  Player Card
+  | SentToGraveyard  Player AnyCard
   | SwitchedPosition Player MonsterSpace Int
   | Turn             Int    Player       Player
 
@@ -42,25 +42,25 @@ display = \case
 
   Attacked sourcePlayer sourceMonster targetPlayer targetMonster ->
     let sp  = view Player.name sourcePlayer in
-    let sm  = displaySpace sourceMonster in
+    let sm  = Space.display sourceMonster in
     let tp  = view Player.name targetPlayer in
-    let tm  = displaySpace targetMonster in
+    let tm  = Space.display targetMonster in
     [i|#{sp}'s #{sm} attacked #{tp}'s #{tm}|]
 
   DamageInflicted player damage ->
     [i|#{view Player.name player} receives #{show damage} damage|]
 
   Destroyed player monster ->
-    [i|#{view Player.name player}'s #{displaySpace monster} got destroyed|]
+    [i|#{view Player.name player}'s #{Space.display monster} got destroyed|]
 
   DirectAttacked sourcePlayer sourceMonster targetPlayer ->
     let sp  = view Player.name sourcePlayer in
-    let sm  = displaySpace sourceMonster in
+    let sm  = Space.display sourceMonster in
     let tp  = view Player.name targetPlayer in
     [i|#{sp}'s #{sm} attacked #{tp} directly|]
 
   DrewCard player card ->
-    [i|#{view Player.name player} drew #{Card.display card}|]
+    [i|#{view Player.name player} drew #{Card.displayAny card}|]
 
   EndBattlePhase -> "Battle phase ended"
 
@@ -87,7 +87,7 @@ display = \case
 
   SentToGraveyard player card ->
     let pl = view Player.name player in
-    let c  = Card.display card in
+    let c  = Card.displayAny card in
     [i|#{pl}'s #{c} was sent to the graveyard|]
 
   SwitchedPosition player space location ->

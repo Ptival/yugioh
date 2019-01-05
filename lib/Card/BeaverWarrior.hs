@@ -8,9 +8,9 @@ import Attribute
 import Card
 import Type
 
-beaverWarrior :: Card
-beaverWarrior = Card
-  { _name        = "Beaver Warrior"
+beaverWarrior :: MonsterCard
+beaverWarrior = Monster
+  { _monsterName = "Beaver Warrior"
   , _attribute   = Earth
   , _level       = 4
   , _monsterType = BeastWarrior

@@ -29,18 +29,23 @@ validMoves = do
   currentPlayerMainMonsterZone <- getMainMonsterZone L.currentPlayer
   otherPlayerMainMonsterZone   <- getMainMonsterZone L.otherPlayer
 
+  let currentPlayerMonsterSpaces = S.monsterSpaces currentPlayerMainMonsterZone
+
+  let sourceMonsters =
+        [ sourceMonster
+        | sourceMonster <- currentPlayerMonsterSpaces
+        , S.isInAttackPosition sourceMonster
+        , not $ view S.hasAttacked sourceMonster
+        ]
+
   let attackMoves = [ Move.Attack sourceMonster targetMonster
-                    | sourceMonster <- S.monsterSpaces currentPlayerMainMonsterZone
-                    , S.isInAttackPosition sourceMonster
-                    , not $ view S.hasAttacked sourceMonster
+                    | sourceMonster <- sourceMonsters
                     , targetMonster <- S.monsterSpaces otherPlayerMainMonsterZone
                     ]
 
   let directAttackMoves = [ Move.DirectAttack sourceMonster
-                          | length (S.monsterSpaces otherPlayerMainMonsterZone) == 0
-                          , sourceMonster <- S.monsterSpaces currentPlayerMainMonsterZone
-                          , S.isInAttackPosition sourceMonster
-                          , not $ view S.hasAttacked sourceMonster
+                          | null (S.monsterSpaces otherPlayerMainMonsterZone)
+                          , sourceMonster <- sourceMonsters
                           ]
 
   return $ []
@@ -53,10 +58,10 @@ battlePhase ::
   Eff e (Maybe Victory)
 battlePhase = validMoves >>= chooseMove >>= \case
 
-  Move.Attack sourceMonster targetMonster -> do
+  Move.Attack sourceMonster targetMonster ->
     Operation.attack L.currentPlayer sourceMonster L.otherPlayer targetMonster
 
-  Move.DirectAttack monster -> do
+  Move.DirectAttack monster ->
     directAttack L.currentPlayer monster L.otherPlayer
 
   Move.EndBattlePhase -> do

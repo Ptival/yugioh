@@ -36,7 +36,7 @@ import           Victory
 runPhase ::
   Operations e =>
   Eff e (Maybe Victory)
-runPhase = do
+runPhase =
   getPhase >>= \case
     Battle -> battlePhase
     Draw   -> drawPhase
@@ -76,5 +76,4 @@ runDuel duelist1 duelist2 =
   let initialState = makeDuel player1 player2
   evalState initialState
     $ runMonoidWriter
-    $ handleOperation
-    $ duel
+    $ handleOperation duel

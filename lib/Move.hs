@@ -2,9 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE MonoLocalBinds #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RankNTypes #-}
@@ -27,6 +25,9 @@ import Position
 import Space
 
 data Move (phase :: Phase) where
+  ActivateSpell ::
+    In phase '[ 'Main ] =>
+    SpellCard -> Move phase
   Attack ::
     In phase '[ 'Battle ] =>
     MonsterSpace -> MonsterSpace -> Move phase
@@ -50,10 +51,10 @@ data Move (phase :: Phase) where
     Move phase
   NormalSummon ::
     In phase '[ 'Main ] =>
-    Card -> Position -> Move phase
+    MonsterCard -> Position -> Move phase
   TributeSummon ::
     In phase '[ 'Main ] =>
-    Card -> Position -> Move phase
+    MonsterCard -> Position -> Move phase
   SwitchPosition ::
     In phase '[ 'Main ] =>
     MonsterSpace -> Move phase
@@ -61,13 +62,17 @@ data Move (phase :: Phase) where
 display :: Move p -> String
 display = \case
 
+  Move.ActivateSpell spell ->
+    let s = Card.display spell in
+    [i|#{s}|]
+
   Move.Attack sourceSpace targetSpace ->
-    let source = Space.displaySpace sourceSpace in
-    let target = Space.displaySpace targetSpace in
+    let source = Space.display sourceSpace in
+    let target = Space.display targetSpace in
     [i|#{source} attacks #{target}|]
 
   DirectAttack sourceSpace ->
-    let source = Space.displaySpace sourceSpace in
+    let source = Space.display sourceSpace in
     [i|#{source} directly attacks|]
 
   DrawCard -> "Draw card"
@@ -86,11 +91,11 @@ display = \case
     [i|Normal summon #{m} in #{p}|]
 
   TributeSummon card position ->
-    let m = Card.display card in
+    let m = Card.displayMonster card in
     let p = Position.display position in
     [i|Tribute summon #{m} in #{p}|]
 
   SwitchPosition space ->
-    let c = Space.displaySpace space in
+    let c = Space.display space in
     let p = Position.display $ view monsterPosition space in
     [i|Switch #{c} to #{p}|]

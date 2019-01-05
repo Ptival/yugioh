@@ -1,0 +1,75 @@
+author:
+  - Valentin Robert <valentin.robert.42@gmail.com>
+
+default-extensions:
+  - DeriveGeneric
+  - DuplicateRecordFields
+  - GADTs
+  - LambdaCase
+  - NamedFieldPuns
+  - RankNTypes
+  - RecordWildCards
+  - ScopedTypeVariables
+  - TypeApplications
+
+dependencies:
+  - base
+  - extensible-effects
+  - ilist
+  - interpolate
+  - lens
+  - monad-loops
+  - random
+  - random-shuffle
+
+executables:
+  yugioh:
+    dependencies:
+      - yugioh
+    main: Main.hs
+    source-dirs: exec
+
+library:
+  source-dirs: lib
+  exposed-modules:
+    - Card
+    - Card.BeaverWarrior
+    - Card.BlueEyesWhiteDragon
+    - Card.CurseOfDragon
+    - Card.DarkMagician
+    - Card.SaggiTheDarkClown
+    - ChooseOption
+    - Driver
+    - Duelist
+    - Log
+    - Utils
+    - Victory
+  other-modules:
+    - Attribute
+    - BattlePhase
+    - CardEffects
+    - Configuration
+    - DrawPhase
+    - Duel
+    - DuelHelpers
+    - EndPhase
+    - GameEffects
+    - Identifier
+    - In
+    - Lenses
+    - Location
+    - MainPhase
+    - Mat
+    - Move
+    - Operation
+    - Phase
+    - Player
+    - Position
+    - Space
+    - Type
+
+license: BSD3
+
+name: yugioh
+
+version: 0.1.0

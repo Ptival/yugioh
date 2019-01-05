@@ -39,7 +39,7 @@ hasNormalSummoned player = player . Player.hasNormalSummoned
 lifePoints :: PlayerLens -> Lens' Duel Int
 lifePoints player = player . Player.lifePoints
 
-mainMonsterZone :: PlayerLens -> Lens' Duel [ScopedSpace]
+mainMonsterZone :: PlayerLens -> Lens' Duel [MonsterZoneSpace]
 mainMonsterZone player = Lenses.mat player . Mat.mainMonsterZone
 
 mat :: PlayerLens -> Lens' Duel Mat.Mat

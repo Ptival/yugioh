@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE MonoLocalBinds #-}
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -14,6 +15,7 @@ module Mat (
   MainMonsterZone,
   Mat(..),
   Space(..),
+  SpellZone,
   deck,
   Mat.display,
   graveyard,
@@ -33,9 +35,10 @@ import Configuration
 import Space
 import Utils
 
-type MainMonsterZone = [ScopedSpace]
-type Graveyard       = [Card.Card]
-type Deck            = [Card.Card]
+type MainMonsterZone = [MonsterZoneSpace]
+type SpellZone       = [SpellZoneSpace]
+type Graveyard       = [AnyCard]
+type Deck            = [AnyCard]
 
 data Mat = Mat
   { _mainMonsterZone :: MainMonsterZone
@@ -49,7 +52,7 @@ makeMat :: ( Member (Reader Configuration) e ) => Deck -> Eff e Mat
 makeMat playerDeck = do
   mmzSize <- askConfiguration mainMonsterZoneSize
   return $ Mat
-    { _mainMonsterZone = replicate mmzSize (ScopedSpace Empty)
+    { _mainMonsterZone = replicate mmzSize emptyMonsterZoneSpace
     , _graveyard       = []
     , _deck            = playerDeck
     }
@@ -60,17 +63,18 @@ displayDeck :: DisplayDeck -> String -> String
 displayDeck = bool id (const "???") . unDisplayDeck
 
 display :: DisplayDeck -> Mat -> String
-display displayDeckFlag (Mat {..}) =
-  let mmz = displayList Space.display _mainMonsterZone in
-  let d   = displayList  Card.display _deck            in
-  let g   = displayList  Card.display _graveyard       in
+display displayDeckFlag Mat{..} =
+  let mmz = displayList Space.displayMonsterZoneSpace _mainMonsterZone in
+  let d   = displayList Card.displayAny               _deck            in
+  let g   = displayList Card.displayAny               _graveyard       in
   [i|Main monster zone:
 #{mmz}
 Deck (#{length _deck}):
 #{displayDeck displayDeckFlag d}
 Graveyard (#{length _graveyard}):
-#{g}|]
+#{g}
+|]
 
 prepareForNewTurn :: Mat -> Mat
 prepareForNewTurn =
-  over mainMonsterZone (map Space.prepareForNewTurn)
+  over mainMonsterZone (map prepareMonsterZoneSpaceForNewTurn)

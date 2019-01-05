@@ -2,7 +2,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE MonoLocalBinds #-}
 
 -- | During the draw phase, players can draw a card.  Eventually, they'll be
 -- | able to do some additional things, like activate specific effects.
@@ -23,7 +22,7 @@ import           Victory
 validMoves ::
   Operations e =>
   Eff e [Move 'Draw]
-validMoves = do
+validMoves =
   getHasDrawnCard L.currentPlayer >>= \case
     True  -> return [ Move.EndDrawPhase ]
     False -> return [ DrawCard ]
@@ -33,7 +32,7 @@ drawPhase ::
   Eff e (Maybe Victory)
 drawPhase = validMoves >>= chooseMove >>= \case
 
-  DrawCard -> do
+  DrawCard ->
     drawCard L.currentPlayer
 
   Move.EndDrawPhase -> do

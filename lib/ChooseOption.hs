@@ -64,7 +64,7 @@ Other player's mat:
 Current player's mat:
 #{Mat.display (DisplayDeck False) currentPlayerMat}
 Current player's hand:
-#{displayList Card.display currentPlayerHand}
+#{displayList Card.displayAny currentPlayerHand}
 Choose an option among the following ones.
 |]
   let options           = mapWithIndex (\ index option -> (displayOption option, index)) validOptions

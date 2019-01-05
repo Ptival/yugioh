@@ -11,6 +11,7 @@ module Operation
   ( Operations
   -- , Operation.addCardToHand
   , Operation.attack
+  , Operation.chooseMonster
   , Operation.chooseMove
   , Operation.directAttack
   , Operation.drawCard
@@ -18,12 +19,13 @@ module Operation
   , Operation.enterBattlePhase
   , Operation.enterEndPhase
   , Operation.enterMainPhase
+  , Operation.getAllMonsters
   -- , Operation.getDeck
   , Operation.getHand
   , Operation.getHasDrawnCard
   , Operation.getHasNormalSummoned
   , Operation.getMainMonsterZone
-  -- , Operation.getMonsterSpaces
+  , Operation.getMonsters
   , Operation.getPhase
   -- , Operation.getPlayer
   , Operation.getStartingHandSize
@@ -65,39 +67,43 @@ import           Utils
 import           Victory
 
 data Operation a where
-  AddCardToHand        :: PlayerLens ->         Card ->               Operation ()
-  ChooseMove           ::     forall p.     [Move p] ->               Operation (Move p)
-  DestroyMonster       :: PlayerLens -> MonsterSpace ->               Operation ()
-  DrawCard             :: PlayerLens ->                               Operation (Maybe Victory)
-  EndTurn              ::                                             Operation ()
-  EnterBattlePhase     ::                                             Operation ()
-  EnterEndPhase        ::                                             Operation ()
-  EnterMainPhase       ::                                             Operation ()
-  FlipMonster          :: PlayerLens -> MonsterSpace ->               Operation ()
-  GetDeck              :: PlayerLens ->                               Operation Deck
-  GetHand              :: PlayerLens ->                               Operation Hand
-  GetHasDrawnCard      :: PlayerLens ->                               Operation Bool
-  GetHasNormalSummoned :: PlayerLens ->                               Operation Bool
-  GetMainMonsterZone   :: PlayerLens ->                               Operation MainMonsterZone
-  GetPhase             ::                                             Operation Phase
-  GetPlayer            :: PlayerLens ->                               Operation Player
-  GetStartingHandSize  ::                                             Operation Int
-  InflictDamage        :: PlayerLens -> Int          ->               Operation (Maybe Victory)
-  Log                  :: Entry      ->                               Operation ()
-  RemoveCardFromHand   :: PlayerLens ->         Card ->               Operation ()
-  SendToGraveyard      :: PlayerLens ->         Card ->               Operation ()
-  SetHasAttacked       :: PlayerLens -> MonsterSpace ->               Operation ()
-  SetHasDrawnCard      :: PlayerLens ->         Bool ->               Operation ()
-  SetHasNormalSummoned :: PlayerLens ->         Bool ->               Operation ()
-  ShuffleDeck          :: PlayerLens ->                               Operation ()
-  SummonMonster        :: PlayerLens ->         Card ->   Position -> Operation ()
-  SwitchPosition       :: PlayerLens -> MonsterSpace ->               Operation ()
-  TributeMonster       :: PlayerLens ->                               Operation ()
+  AddCardToHand        ::     PlayerLens ->      AnyCard ->               Operation ()
+  ChooseMonster        :: [MonsterSpace] ->                               Operation MonsterSpace
+  ChooseMove           ::         forall p.     [Move p] ->               Operation (Move p)
+  DestroyMonster       ::     PlayerLens -> MonsterSpace ->               Operation ()
+  DrawCard             ::     PlayerLens ->                               Operation (Maybe Victory)
+  EndTurn              ::                                                 Operation ()
+  EnterBattlePhase     ::                                                 Operation ()
+  EnterEndPhase        ::                                                 Operation ()
+  EnterMainPhase       ::                                                 Operation ()
+  FlipMonster          ::     PlayerLens -> MonsterSpace ->               Operation ()
+  GetDeck              ::     PlayerLens ->                               Operation Deck
+  GetHand              ::     PlayerLens ->                               Operation Hand
+  GetHasDrawnCard      ::     PlayerLens ->                               Operation Bool
+  GetHasNormalSummoned ::     PlayerLens ->                               Operation Bool
+  GetMainMonsterZone   ::     PlayerLens ->                               Operation MainMonsterZone
+  GetPhase             ::                                                 Operation Phase
+  GetPlayer            ::     PlayerLens ->                               Operation Player
+  GetStartingHandSize  ::                                                 Operation Int
+  InflictDamage        ::     PlayerLens -> Int          ->               Operation (Maybe Victory)
+  Log                  ::     Entry      ->                               Operation ()
+  RemoveCardFromHand   ::     PlayerLens ->      AnyCard ->               Operation ()
+  SendToGraveyard      ::     PlayerLens ->      AnyCard ->               Operation ()
+  SetHasAttacked       ::     PlayerLens -> MonsterSpace ->               Operation ()
+  SetHasDrawnCard      ::     PlayerLens ->         Bool ->               Operation ()
+  SetHasNormalSummoned ::     PlayerLens ->         Bool ->               Operation ()
+  ShuffleDeck          ::     PlayerLens ->                               Operation ()
+  SummonMonster        ::     PlayerLens ->  MonsterCard ->   Position -> Operation ()
+  SwitchPosition       ::     PlayerLens -> MonsterSpace ->               Operation ()
+  TributeMonster       ::     PlayerLens ->                               Operation ()
 
 type Operations e = Member Operation e
 
-addCardToHand :: ( Member Operation e ) => PlayerLens -> Card -> Eff e ()
+addCardToHand :: ( Member Operation e ) => PlayerLens -> AnyCard -> Eff e ()
 addCardToHand player card = send $ AddCardToHand player card
+
+chooseMonster :: ( Member Operation e ) => [MonsterSpace] -> Eff e MonsterSpace
+chooseMonster options = send $ ChooseMonster options
 
 chooseMove :: ( Member Operation e ) => [Move p] -> Eff e (Move p)
 chooseMove options = send $ ChooseMove options
@@ -123,6 +129,13 @@ enterMainPhase = send $ EnterMainPhase
 flipMonster :: ( Member Operation e ) => PlayerLens -> MonsterSpace -> Eff e ()
 flipMonster player monster = send $ FlipMonster player monster
 
+getAllMonsters :: Operations e => Eff e [MonsterSpace]
+getAllMonsters = do
+  currentPlayerMainMonsterZone <- getMainMonsterZone L.currentPlayer
+  otherPlayerMainMonsterZone   <- getMainMonsterZone L.otherPlayer
+  let allMonsterZones = currentPlayerMainMonsterZone ++ otherPlayerMainMonsterZone
+  return $ monsterSpaces allMonsterZones
+
 -- getDeck :: ( Member Operation e ) => PlayerLens -> Eff e Deck
 -- getDeck player = send $ GetDeck player
 
@@ -138,8 +151,10 @@ getHasNormalSummoned player = send $ GetHasNormalSummoned player
 getMainMonsterZone :: ( Member Operation e ) => PlayerLens -> Eff e MainMonsterZone
 getMainMonsterZone player = send $ GetMainMonsterZone player
 
--- getMonsterSpaces :: ( Member Operation e ) => PlayerLens -> Eff e [MonsterSpace]
--- getMonsterSpaces player = monsterSpaces <$> getMainMonsterZone player
+getMonsters :: Operations e => PlayerLens -> Eff e [MonsterSpace]
+getMonsters player = do
+  currentPlayerMainMonsterZone <- getMainMonsterZone player
+  return $ monsterSpaces currentPlayerMainMonsterZone
 
 getPhase :: ( Member Operation e ) => Eff e Phase
 getPhase = send GetPhase
@@ -156,10 +171,10 @@ inflictDamage player damage = send $ InflictDamage player damage
 log :: ( Member Operation e ) => Entry -> Eff e ()
 log entry = send $ Log entry
 
-removeCardFromHand :: ( Member Operation e ) => PlayerLens -> Card -> Eff e ()
+removeCardFromHand :: ( Member Operation e ) => PlayerLens -> AnyCard -> Eff e ()
 removeCardFromHand player card = send $ RemoveCardFromHand player card
 
-sendToGraveyard :: ( Member Operation e ) => PlayerLens -> Card -> Eff e ()
+sendToGraveyard :: ( Member Operation e ) => PlayerLens -> AnyCard -> Eff e ()
 sendToGraveyard player card = send $ SendToGraveyard player card
 
 setHasAttacked :: ( Member Operation e ) => PlayerLens -> MonsterSpace -> Eff e ()
@@ -174,7 +189,7 @@ setHasNormalSummoned player value = send $ SetHasNormalSummoned player value
 shuffleDeck :: ( Member Operation e ) => PlayerLens -> Eff e ()
 shuffleDeck player = send $ ShuffleDeck player
 
-summonMonster :: ( Member Operation e ) => PlayerLens -> Card -> Position -> Eff e ()
+summonMonster :: ( Member Operation e ) => PlayerLens -> MonsterCard -> Position -> Eff e ()
 summonMonster player card position = send $ SummonMonster player card position
 
 switchPosition :: ( Member Operation e ) => PlayerLens -> MonsterSpace -> Eff e ()
@@ -261,6 +276,10 @@ runOperation operation = case operation of
 
   AddCardToHand player card -> overLensed (L.hand player) (card :)
 
+  ChooseMonster options -> do
+    duel <- get
+    chooseOption duel Space.display options
+
   ChooseMove options -> do
     duel <- get
     chooseOption duel Move.display options
@@ -268,7 +287,7 @@ runOperation operation = case operation of
   DestroyMonster player monster -> do
     Utils.log =<< Destroyed <$> getLensed player <*^> monster
     overLensed (player . mat . mainMonsterZone) $ map (Space.destroyMonster monster)
-    handleOperation $ Operation.sendToGraveyard player (view monsterCard monster)
+    handleOperation $ Operation.sendToGraveyard player (Card.anyCard $ view monsterCard monster)
 
   Operation.DrawCard player -> do
     getLensed (L.deck player) >>= \case
@@ -301,7 +320,7 @@ runOperation operation = case operation of
 
   FlipMonster player monster -> do
     Utils.log =<< Flipped <$> getLensed player <*^> monster
-    overMonster player monster Space.flip
+    DuelHelpers.overMonster player monster Space.flip
 
   GetDeck              player -> getLensed (L.deck              player)
   GetHand              player -> getLensed (L.hand              player)
@@ -333,14 +352,14 @@ runOperation operation = case operation of
 
   Operation.SwitchPosition player monster -> do
     playerMainMonsterZone <- getLensed (L.mainMonsterZone player)
-    let monsters         = filterMonsterCards playerMainMonsterZone
+    let monsters = Space.filterMonsters playerMainMonsterZone
     case findIndex (isSameMonster monster) monsters of
       Nothing -> fail "Could not find the monster whose position to switch"
       Just index -> do
         overLensed (L.mainMonsterZone player)
-          $ modifyAt index (whenMonster Space.switchPosition)
+          $ modifyAt index Space.switchPosition
         newMainMonsterZone <- getLensed (L.mainMonsterZone player)
-        let newMonsterSpace = filterMonsterCards newMainMonsterZone !! index
+        let newMonsterSpace = Space.filterMonsters newMainMonsterZone !! index
         Utils.log =<< SwitchedPosition <$> getLensed player <*^> newMonsterSpace <*^> index
 
   RemoveCardFromHand player card -> overLensed (L.hand player) (delete card)
@@ -349,20 +368,21 @@ runOperation operation = case operation of
     Utils.log =<< SentToGraveyard <$> getLensed player <*^> card
     overLensed (player . mat . graveyard) (card :)
 
-  SetHasAttacked player monster -> overMonster player monster (set hasAttacked True)
+  SetHasAttacked player monster ->
+    DuelHelpers.overMonster player monster (set hasAttacked True)
 
   SummonMonster player card position -> do
     handleOperation $ do
-      removeCardFromHand   player card
-      setHasNormalSummoned player True
+      removeCardFromHand   player $ Card.anyCard card
+      setHasNormalSummoned player $ True
     monsterSpace                 <- Space.summonMonster card position
     currentPlayerMainMonsterZone <- getLensed (L.mainMonsterZone player)
-    case findIndex isEmpty currentPlayerMainMonsterZone of
+    case findIndex isEmptyMonsterZoneSpace currentPlayerMainMonsterZone of
       Nothing -> fail "SummonMonster: Could not find a space on the mat to summon the card"
       Just index -> do
         overLensed (L.mainMonsterZone L.currentPlayer)
           $ modifyAt index
-          $ const $ ScopedSpace monsterSpace
+          $ const $ MonsterZoneSpace monsterSpace
         Utils.log =<< NormalSummoned <$> getLensed L.currentPlayer <*^> monsterSpace <*^> index
 
   TributeMonster player -> do
@@ -370,7 +390,9 @@ runOperation operation = case operation of
     tribute               <- chooseTribute $ monsterSpaces playerMainMonsterZone
     handleOperation $ Operation.destroyMonster player tribute
 
-handleOperation :: ( GameEffects e ) => Eff '[Operation] a -> Eff e a
+handleOperation ::
+  GameEffects e =>
+  Eff '[Operation] a -> Eff e a
 handleOperation (Val x) = return x
 handleOperation (E u q) = case decomp q of
   Right operation -> do

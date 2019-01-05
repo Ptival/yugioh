@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 -- | A `Position` describes how a monster card is set on the field.
 

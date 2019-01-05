@@ -42,4 +42,4 @@ chooseTribute tributes = do
   chooseOption duel displayTribute tributes
   where
     displayTribute :: MonsterSpace -> String
-    displayTribute monster = [i|Tribute #{Space.displaySpace monster}|]
+    displayTribute monster = [i|Tribute #{Space.display monster}|]

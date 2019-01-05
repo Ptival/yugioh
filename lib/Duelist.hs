@@ -15,7 +15,7 @@ import Card
 
 data Duelist = Duelist
   { _name :: String
-  , _deck :: [Card]
+  , _deck :: [AnyCard]
   }
 
 makeLenses ''Duelist

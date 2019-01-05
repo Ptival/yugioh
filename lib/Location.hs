@@ -45,10 +45,11 @@ display location =
 
 isValid :: Location -> Bool
 isValid location =
-  let player          = view side location          in
-  let checkLength n l = length (view l player) >= n in
   case view cardLocation location of
   Deck            n -> checkLength n (mat . deck)
   Graveyard       n -> checkLength n (mat . graveyard)
   Hand            n -> checkLength n hand
   MainMonsterZone n -> checkLength n (mat . mainMonsterZone)
+  where
+    checkLength :: Int -> Getting [a] Player [a] -> Bool
+    checkLength n l = length (view l (view side location)) >= n

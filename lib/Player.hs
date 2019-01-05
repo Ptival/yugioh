@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MonoLocalBinds #-}
 {-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 -- | A `Player` is a participant in a duel.  Players are created from `Duelist`,
@@ -38,7 +37,7 @@ import Duelist
 import Mat
 import Utils
 
-type Hand = [Card.Card]
+type Hand = [AnyCard]
 
 data Player = Player
   { _name              :: String
@@ -77,13 +76,14 @@ prepareForNewTurn
   . over mat               Mat.prepareForNewTurn
 
 display :: DisplayDeck -> Player -> String
-display displayDeck (Player {..}) =
-  let h = displayList Card.display _hand in
+display displayDeck Player{..} =
+  let h = displayList Card.displayAny _hand in
   [i|#{_name} (LP: #{_lifePoints})
 Hand (#{length _hand}):
 #{h}
 TEST
-#{Mat.display displayDeck _mat}|]
+#{Mat.display displayDeck _mat}
+|]
 
 inflictDamage :: Int -> Player -> Player
 inflictDamage damage = over lifePoints (\ lp -> max 0 (lp - damage))

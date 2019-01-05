@@ -1,1 +1,6 @@
+/.envrc
 /.stack-work/
+/dist/
+/dist-newstyle/
+/default.nix
+/stack.yaml.lock

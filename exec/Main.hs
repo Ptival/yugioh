@@ -12,6 +12,7 @@ module Main (
 import Control.Eff              (Eff, Lifted, runLift)
 import Control.Monad            (forM_)
 
+import Card
 import Card.BeaverWarrior
 import Card.BlueEyesWhiteDragon
 import Card.CurseOfDragon
@@ -28,17 +29,17 @@ setoKaiba :: Duelist
 setoKaiba = Duelist
   { _name = "Seto Kaiba"
   , _deck = []
-            ++ replicate 3 blueEyesWhiteDragon
-            ++ replicate 3 saggiTheDarkClown
+            ++ replicate 3 (anyCard blueEyesWhiteDragon)
+            ++ replicate 3 (anyCard saggiTheDarkClown)
   }
 
 yamiYugi :: Duelist
 yamiYugi = Duelist
   { _name = "Yami Yugi"
   , _deck = []
-            ++ replicate 3 beaverWarrior
-            ++ replicate 3 curseOfDragon
-            ++ replicate 3 darkMagician
+            ++ replicate 3 (anyCard beaverWarrior)
+            ++ replicate 3 (anyCard curseOfDragon)
+            ++ replicate 3 (anyCard darkMagician)
   }
 
 data ChooseOptionHandler
@@ -61,9 +62,8 @@ main = do
         , ("Randomly (computer picks random moves for both players)", Randomly)
         ]
   chooseMoveHandlerDescriptor <- promptForOption prompt options
-  let chooseMoveHandler = getChooseOptionHandler chooseMoveHandlerDescriptor
   (victory, duelLog) <- runLift
-                        $ handleChooseOption chooseMoveHandler
+                        $ handleChooseOption (getChooseOptionHandler chooseMoveHandlerDescriptor)
                         $ runDuel setoKaiba yamiYugi
   forM_ duelLog (putStrLn . Log.display)
   putStrLn $ Victory.display victory

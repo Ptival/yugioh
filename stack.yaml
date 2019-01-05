@@ -1,12 +1,9 @@
 flags: {}
 
 extra-deps:
-  - extensible-effects-4.0.0.0
-  - lens-4.17
-  - ListZipper-1.2.0.2
-  - type-level-sets-0.8.7.0
+  - extensible-effects-5.0.0.1@sha256:2ed0bee04c8bf334358147da6d92ff31e9fbbefceb75ef3e408a0d858aec0cc6
 
-resolver: lts-12.16
+resolver: lts-14.12
 
 packages:
   - '.'
