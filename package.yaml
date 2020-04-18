@@ -1,0 +1,76 @@
+author:
+  - Valentin Robert <valentin.robert.42@gmail.com>
+
+dependencies:
+  - base            ^>= 4.12.0.0
+  - ilist           ^>= 0.4.0.0
+  - interpolate     ^>= 0.2.0
+  - lens            ^>= 4.17.1
+  - monad-loops
+  - random
+  - random-shuffle
+  - polysemy        ^>= 1.3.0.0
+  - polysemy-plugin ^>= 0.2.5.0
+
+executables:
+  yugioh:
+    main: Main.hs
+    source-dirs: exe
+    dependencies:
+      - yugioh
+
+ghc-options:
+  - -fplugin=Polysemy.Plugin
+  - -Wall
+  - -Werror
+
+library:
+
+  dependencies: []
+
+  exposed-modules:
+    - YuGiOh.Card.BeaverWarrior
+    - YuGiOh.Card.BlueEyesWhiteDragon
+    - YuGiOh.Card.CurseOfDragon
+    - YuGiOh.Card.DarkMagician
+    - YuGiOh.Card.SaggiTheDarkClown
+    - YuGiOh.ChooseOption
+    - YuGiOh.Classes.Displayable
+    - YuGiOh.Driver
+    - YuGiOh.Duelist
+    - YuGiOh.Fresh
+    - YuGiOh.Log
+    - YuGiOh.Utils
+    - YuGiOh.Victory
+
+  other-modules:
+    - YuGiOh.Attribute
+    - YuGiOh.BattlePhase
+    - YuGiOh.Card
+    - YuGiOh.Classes.Flippable
+    - YuGiOh.Configuration
+    - YuGiOh.DrawPhase
+    - YuGiOh.Duel
+    - YuGiOh.DuelHelpers
+    - YuGiOh.EndPhase
+    - YuGiOh.GameEffects
+    - YuGiOh.In
+    - YuGiOh.Lenses
+    - YuGiOh.Location
+    - YuGiOh.MainPhase
+    - YuGiOh.Mat
+    - YuGiOh.Move
+    - YuGiOh.Operation
+    - YuGiOh.Phase
+    - YuGiOh.Player
+    - YuGiOh.Position
+    - YuGiOh.Space
+    - YuGiOh.Type
+
+  source-dirs: lib
+
+license: BSD3
+
+name: yugioh
+
+version: 0.1.0
