@@ -10,7 +10,6 @@ module YuGiOh.Driver
   )
 where
 
-import Control.Monad (replicateM_)
 import Control.Monad.Loops (untilJust)
 import Polysemy
 import Polysemy.Fail
@@ -34,34 +33,35 @@ import YuGiOh.Player
 import YuGiOh.Victory
 
 runPhase ::
+  Member (Embed IO) e =>
   Member Operation e =>
   Sem e (Maybe Victory)
 runPhase =
   getPhase >>= \case
-    Battle -> battlePhase
-    Draw -> drawPhase
-    End -> endPhase
-    Main -> mainPhase
+    BattlePhase StartStep -> startStep
+    BattlePhase BattleStep -> battleStep
+    BattlePhase DamageStep -> damageStep
+    BattlePhase EndStep -> endStep
+    DrawPhase -> drawPhase
+    EndPhase-> endPhase
+    MainPhase -> mainPhase
 
 duel ::
+  Member (Embed IO) e =>
   Member Operation e =>
   Sem e Victory
 duel = do
   shuffleDeck L.currentPlayer
   shuffleDeck L.otherPlayer
-  handSize <- getStartingHandSize
-  replicateM_ handSize $ drawCard L.currentPlayer
-  replicateM_ handSize $ drawCard L.otherPlayer
-  endTurn
   untilJust runPhase
 
 makeDuel :: Player -> Player -> Duel
 makeDuel firstPlayer secondPlayer =
   Duel
-    { _turn = 0,
-      _phase = End,
-      _currentPlayer = secondPlayer,
-      _otherPlayer = firstPlayer
+    { _turn = 1,
+      _phase = DrawPhase,
+      _currentPlayer = firstPlayer,
+      _otherPlayer = secondPlayer
     }
 
 runDuel ::

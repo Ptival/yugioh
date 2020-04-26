@@ -13,6 +13,7 @@ where
 import Control.Monad (forM_)
 import Polysemy
 import Polysemy.Fail
+import Polysemy.State
 import YuGiOh.Card.BeaverWarrior
 import YuGiOh.Card.BlueEyesWhiteDragon
 import YuGiOh.Card.CurseOfDragon
@@ -71,6 +72,7 @@ main = do
     runFinal . embedToFinal
       $ handleChooseOption (getChooseOptionHandler chooseMoveHandlerDescriptor)
       $ runFail
+      $ (snd <$>) $ runState (Counters 0 0)
       $ handleFresh
       $ runDuel setoKaiba yamiYugi
   forM_ duelLog (putStrLn . display)

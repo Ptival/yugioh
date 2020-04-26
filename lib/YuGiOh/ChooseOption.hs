@@ -57,11 +57,11 @@ handleChooseOptionIO (ChooseOption duel displayOption validOptions) = embed $ do
   let prompt =
         [i|
 Other player's mat:
-#{display otherPlayerMat}
+ #{display otherPlayerMat}
 Current player's mat:
-#{display currentPlayerMat}
+ #{display currentPlayerMat}
 Current player's hand:
-#{displayList display currentPlayerHand}
+ #{displayList display currentPlayerHand}
 Choose an option among the following ones.
 |]
   let options = mapWithIndex (\index option -> (displayOption option, index)) validOptions
@@ -76,6 +76,7 @@ handleChooseOptionRandom ::
   Sem e option
 handleChooseOptionRandom (ChooseOption _ _ validOptions) = embed $ do
   let len = length validOptions
+  putStrLn "handleChooseOptionRandom"
   when (len == 0) $ throwIO EmptyList
   optionIndex <- randomRIO (0, len - 1)
   let chosenOption = validOptions !! optionIndex

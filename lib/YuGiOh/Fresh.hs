@@ -7,7 +7,8 @@
 {-# LANGUAGE TypeOperators #-}
 
 module YuGiOh.Fresh
-  ( Fresh,
+  ( Counters (..),
+    Fresh,
     freshInt,
     freshString,
     handleFresh,
@@ -49,5 +50,5 @@ runFresh (FreshString prefix) =
 
 handleFresh ::
   Sem (Fresh ': e) a ->
-  Sem e a
-handleFresh = interpret ((snd <$>) . runState (Counters 0 0) . runFresh)
+  Sem (State Counters ': e) a
+handleFresh = reinterpret runFresh

@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE MonoLocalBinds #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -60,16 +59,16 @@ makeMat playerDeck = do
       }
 
 instance Displayable Mat where
-  display (Mat {..}) =
+  display Mat {..} =
     let mmz = displayList display _mainMonsterZone
         d = displayList display _deck
         g = displayList display _graveyard
      in [i|Main monster zone:
-#{mmz}
+ #{mmz}
 Deck (#{length _deck}):
-#{d}
+ #{d}
 Graveyard (#{length _graveyard}):
-#{g}|]
+ #{g}|]
 
 prepareForNewTurn :: Mat -> Mat
 prepareForNewTurn =

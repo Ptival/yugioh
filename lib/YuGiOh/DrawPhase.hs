@@ -2,27 +2,27 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE MonoLocalBinds #-}
 
 -- | During the draw phase, players can draw a card.  Eventually, they'll be
--- | able to do some additional things, like activate specific effects.
+-- able to do some additional things, like activate specific effects.
 module YuGiOh.DrawPhase
   ( drawPhase,
   )
 where
 
+import Control.Monad (replicateM_)
 import Polysemy
 import qualified YuGiOh.Lenses as L
 import YuGiOh.Move as Move
 import YuGiOh.Operation
 import YuGiOh.Phase
-import Prelude hiding (log)
 import YuGiOh.Victory
+import Prelude hiding (log)
 
 validMoves ::
   Member Operation e =>
-  Sem e [Move 'Draw]
-validMoves = do
+  Sem e [Move 'DrawPhase]
+validMoves =
   getHasDrawnCard L.currentPlayer >>= \case
     True -> return [Move.EndDrawPhase]
     False -> return [DrawCard]
@@ -30,9 +30,19 @@ validMoves = do
 drawPhase ::
   Member Operation e =>
   Sem e (Maybe Victory)
-drawPhase = validMoves >>= chooseMove >>= \case
-  DrawCard -> do
-    drawCard L.currentPlayer
-  Move.EndDrawPhase -> do
-    enterMainPhase
-    return Nothing
+drawPhase =
+  do
+    turnNumber <- getTurnNumber
+    if turnNumber == 1
+      then do
+        shs <- getStartingHandSize
+        replicateM_ shs $ drawCard L.currentPlayer
+        replicateM_ shs $ drawCard L.otherPlayer
+        enter MainPhase
+        return Nothing
+      else validMoves >>= chooseMove >>= \case
+        DrawCard ->
+          drawCard L.currentPlayer
+        Move.EndDrawPhase -> do
+          enter MainPhase
+          return Nothing

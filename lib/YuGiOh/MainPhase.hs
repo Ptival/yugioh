@@ -13,7 +13,9 @@ where
 import Control.Lens (view)
 import Control.Monad (replicateM_)
 import Polysemy (Member, Sem)
+import Polysemy.Embed
 import YuGiOh.Card
+import YuGiOh.Classes.Displayable
 import qualified YuGiOh.Lenses as L
 import YuGiOh.Move
 import YuGiOh.Operation
@@ -32,7 +34,7 @@ tributeFor n
 
 validMoves ::
   Member Operation e =>
-  Sem e [Move 'Main]
+  Sem e [Move 'MainPhase]
 validMoves = do
   currentPlayerHand <- getHand L.currentPlayer
   currentPlayerHasNormalSummoned <- getHasNormalSummoned L.currentPlayer
@@ -70,24 +72,34 @@ validMoves = do
       ++ switchPositionMoves
 
 mainPhase ::
+  Member (Embed IO) e =>
   Member Operation e =>
   Sem e (Maybe Victory)
-mainPhase = validMoves >>= chooseMove >>= \case
-  EndMainPhase -> do
-    enterBattlePhase
-    return Nothing
-  EndTurn -> do
-    endTurn
-    return Nothing
-  NormalSummon card position -> do
-    summonMonster L.currentPlayer card position
-    return Nothing
-  TributeSummon card position -> do
-    let cardLevel = view level card
-    let requiredTributes = tributeFor cardLevel
-    replicateM_ requiredTributes $ tributeMonster L.currentPlayer
-    summonMonster L.currentPlayer card position
-    return Nothing
-  SwitchPosition monster -> do
-    switchPosition L.currentPlayer monster
-    return Nothing
+mainPhase =
+  validMoves
+    >>= ( \vms ->
+            do
+              embed $ putStrLn "Valid moves are:"
+              embed $ print $ display <$> vms
+              return vms
+        )
+    >>= chooseMove
+    >>= \case
+      EndMainPhase -> do
+        enter $ BattlePhase StartStep
+        return Nothing
+      EndTurn -> do
+        endTurn
+        return Nothing
+      NormalSummon card position -> do
+        summonMonster L.currentPlayer card position
+        return Nothing
+      TributeSummon card position -> do
+        let cardLevel = view level card
+        let requiredTributes = tributeFor cardLevel
+        replicateM_ requiredTributes $ tributeMonster L.currentPlayer
+        summonMonster L.currentPlayer card position
+        return Nothing
+      SwitchPosition monster -> do
+        switchPosition L.currentPlayer monster
+        return Nothing

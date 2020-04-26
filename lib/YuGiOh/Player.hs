@@ -1,6 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE MonoLocalBinds #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -30,15 +29,15 @@ import Data.Function (on)
 import Data.String.Interpolate (i)
 import Polysemy (Member, Sem)
 import Polysemy.Reader (Reader, ask)
-import YuGiOh.Card
+import YuGiOh.Card as Card
 import YuGiOh.Classes.Displayable
 import YuGiOh.Configuration
-import YuGiOh.Duelist
+import YuGiOh.Duelist as Duelist
 import YuGiOh.Fresh
-import YuGiOh.Mat
+import YuGiOh.Mat as Mat
 import YuGiOh.Utils
 
-type Hand = [YuGiOh.Card.Card]
+type Hand = [Card.Card]
 
 data Player
   = Player
@@ -48,7 +47,7 @@ data Player
         _hasNormalSummoned :: Bool,
         _identifier :: Int,
         _lifePoints :: Int,
-        _mat :: YuGiOh.Mat.Mat
+        _mat :: Mat.Mat
       }
 
 makeLenses ''Player
@@ -61,10 +60,10 @@ makePlayer ::
 makePlayer duelist = do
   ident <- freshInt
   lp <- view originalLifePoints <$> ask
-  playerMat <- YuGiOh.Mat.makeMat $ view YuGiOh.Duelist.deck duelist
+  playerMat <- Mat.makeMat $ view Duelist.deck duelist
   return $
     Player
-      { _name = view YuGiOh.Duelist.name duelist,
+      { _name = view Duelist.name duelist,
         _hand = [],
         _hasDrawnCard = False,
         _hasNormalSummoned = False,
@@ -77,16 +76,16 @@ prepareForNewTurn :: Player -> Player
 prepareForNewTurn =
   set hasDrawnCard False
     . set hasNormalSummoned False
-    . over mat YuGiOh.Mat.prepareForNewTurn
+    . over mat Mat.prepareForNewTurn
 
 instance Displayable Player where
-  display (Player {..}) =
+  display Player {..} =
     let h = displayList display _hand
      in [i|#{_name} (LP: #{_lifePoints})
 Hand (#{length _hand}):
-#{h}
+ #{h}
 TEST
-#{display _mat}|]
+ #{display _mat}|]
 
 inflictDamage :: Int -> Player -> Player
 inflictDamage damage = over lifePoints (\lp -> max 0 (lp - damage))

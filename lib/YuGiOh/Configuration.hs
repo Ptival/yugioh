@@ -4,7 +4,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TemplateHaskell #-}
 
--- | Define the `Configuration` datatype.
+-- | Define the @Configuration@ datatype.
 module YuGiOh.Configuration
   ( Configuration (..),
     askConfiguration,
@@ -16,7 +16,7 @@ module YuGiOh.Configuration
     spellTrapPendulumZoneSize,
     startingHandSize,
     testingConfiguration,
-    tradingCardGameConfiguration,
+    tcgConfiguration,
   )
 where
 
@@ -60,8 +60,8 @@ testingConfiguration =
       _startingHandSize = 4
     }
 
-tradingCardGameConfiguration :: Configuration
-tradingCardGameConfiguration =
+tcgConfiguration :: Configuration
+tcgConfiguration =
   Configuration
     { _deckMinimumSize = 40,
       _deckMaximumSize = 60,

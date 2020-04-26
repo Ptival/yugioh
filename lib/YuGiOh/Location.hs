@@ -7,7 +7,6 @@
 module YuGiOh.Location
   ( CardLocation (..),
     Location (..),
-    YuGiOh.Location.display,
     displayCardLocation,
     isValid,
   )
@@ -15,6 +14,7 @@ where
 
 import Control.Lens
 import Data.String.Interpolate
+import YuGiOh.Classes.Displayable
 import YuGiOh.Mat
 import YuGiOh.Player
 
@@ -39,9 +39,9 @@ data Location
 
 makeLenses ''Location
 
-display :: Location -> String
-display location =
-  [i|#{view (side . name) location}'s side, #{displayCardLocation (view cardLocation location)}'|]
+instance Displayable Location where
+  display location =
+    [i|#{view (side . name) location}'s side, #{displayCardLocation (view cardLocation location)}'|]
 
 isValid :: Location -> Bool
 isValid location =

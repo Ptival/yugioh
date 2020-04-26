@@ -66,7 +66,7 @@ data SpaceType
   deriving (Eq, Generic, Show)
 
 newtype Identifier = Identifier Int
-  deriving (Eq)
+  deriving (Eq, Show)
 
 data Space a where
   Empty :: Space 'IsEmpty
@@ -123,7 +123,7 @@ instance Show ScopedSpace where
 instance Displayable (Space a) where
   display Empty = "Empty"
   display MonsterCard {..} =
-    [i|#{display _monsterCard} (#{display _monsterPosition})|]
+    [i|#{_identifier}: #{display _monsterCard} (#{display _monsterPosition})|]
 
 scoped :: (forall a. Space a -> b) -> ScopedSpace -> b
 scoped k (ScopedSpace s) = k s

@@ -20,56 +20,51 @@ import YuGiOh.Card
 import YuGiOh.Classes.Displayable
 import YuGiOh.In
 import YuGiOh.Phase
-import YuGiOh.Position
+import YuGiOh.Position (Position)
 import YuGiOh.Space
 
 data Move (phase :: Phase) where
   Attack ::
-    In phase '[ 'Battle] =>
+    In phase '[ 'BattlePhase 'BattleStep] =>
     MonsterSpace ->
     MonsterSpace ->
     Move phase
   DirectAttack ::
-    In phase '[ 'Battle] =>
+    In phase '[ 'BattlePhase 'BattleStep] =>
     MonsterSpace ->
     Move phase
   DrawCard ::
-    In phase '[ 'Draw] =>
-    Move
-      phase
+    In phase '[ 'DrawPhase] =>
+    Move phase
   EndBattlePhase ::
-    In phase '[ 'Battle] =>
-    Move
-      phase
+    In phase '[ 'BattlePhase 'BattleStep] =>
+    Move phase
   EndDrawPhase ::
-    In phase '[ 'Draw] =>
-    Move
-      phase
+    In phase '[ 'DrawPhase] =>
+    Move phase
   EndMainPhase ::
-    In phase '[ 'Main] =>
-    Move
-      phase
+    In phase '[ 'MainPhase] =>
+    Move phase
   EndTurn ::
-    In phase '[ 'Battle, 'End, 'Main] =>
-    Move
-      phase
+    In phase '[ 'BattlePhase 'BattleStep, 'EndPhase, 'MainPhase] =>
+    Move phase
   NormalSummon ::
-    In phase '[ 'Main] =>
+    In phase '[ 'MainPhase] =>
     Card ->
     Position ->
     Move phase
   TributeSummon ::
-    In phase '[ 'Main] =>
+    In phase '[ 'MainPhase] =>
     Card ->
     Position ->
     Move phase
   SwitchPosition ::
-    In phase '[ 'Main] =>
+    In phase '[ 'MainPhase] =>
     MonsterSpace ->
     Move phase
 
 instance Displayable (Move p) where
-  display (YuGiOh.Move.Attack sourceSpace targetSpace) =
+  display (Attack sourceSpace targetSpace) =
     let source = display sourceSpace
         target = display targetSpace
      in [i|#{source} attacks #{target}|]

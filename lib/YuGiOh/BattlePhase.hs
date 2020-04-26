@@ -2,12 +2,14 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE MonoLocalBinds #-}
 {-# LANGUAGE RankNTypes #-}
 
 -- | During the battle phase, a player may choose to attack a monster.
 module YuGiOh.BattlePhase
-  ( battlePhase,
+  ( battleStep,
+    damageStep,
+    endStep,
+    startStep,
   )
 where
 
@@ -24,7 +26,7 @@ import Prelude hiding (log)
 
 validMoves ::
   Member Operation e =>
-  Sem e [Move 'Battle]
+  Sem e [Move ('BattlePhase 'BattleStep)]
 validMoves = do
   currentPlayerMainMonsterZone <- getMainMonsterZone L.currentPlayer
   otherPlayerMainMonsterZone <- getMainMonsterZone L.otherPlayer
@@ -37,7 +39,7 @@ validMoves = do
         ]
   let directAttackMoves =
         [ DirectAttack sourceMonster
-          | length (S.monsterSpaces otherPlayerMainMonsterZone) == 0,
+          | null (S.monsterSpaces otherPlayerMainMonsterZone),
             sourceMonster <- S.monsterSpaces currentPlayerMainMonsterZone,
             S.isInAttackPosition sourceMonster,
             not $ view S.hasAttacked sourceMonster
@@ -48,17 +50,41 @@ validMoves = do
       ++ directAttackMoves
       ++ [EndBattlePhase, EndTurn]
 
-battlePhase ::
+startStep ::
   Member Operation e =>
   Sem e (Maybe Victory)
-battlePhase = validMoves >>= chooseMove >>= \case
-  Attack sourceMonster targetMonster -> do
+startStep =
+  do
+    enter $ BattlePhase BattleStep
+    return Nothing
+
+battleStep ::
+  Member Operation e =>
+  Sem e (Maybe Victory)
+battleStep = validMoves >>= chooseMove >>= \case
+  Attack sourceMonster targetMonster ->
     attack L.currentPlayer sourceMonster L.otherPlayer targetMonster
-  DirectAttack monster -> do
+  DirectAttack monster ->
     directAttack L.currentPlayer monster L.otherPlayer
   EndBattlePhase -> do
-    enterEndPhase
+    enter EndPhase
     return Nothing
   EndTurn -> do
     endTurn
+    return Nothing
+
+damageStep ::
+  Member Operation e =>
+  Sem e (Maybe Victory)
+damageStep =
+  do
+    enter EndPhase
+    return Nothing
+
+endStep ::
+  Member Operation e =>
+  Sem e (Maybe Victory)
+endStep =
+  do
+    enter EndPhase
     return Nothing
