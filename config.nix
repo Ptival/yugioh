@@ -2,7 +2,7 @@
 }:
 rec {
 
-  ghcVersion = "ghc865";
+  ghcVersion = "ghc882";
 
   yugioh-overlay = self: super:
     let
@@ -26,7 +26,7 @@ rec {
         };
       };
 
-  nixpkgsRev = "c2dcdea8c68631fc15ec837d0df7def2b66d0676";
+  nixpkgsRev = "694ac1b127ce34fb3bf5890232e1375b3911867c";
 
   pkg = {
     name = "yugioh";
