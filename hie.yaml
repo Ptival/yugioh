@@ -1,6 +1,11 @@
 cradle:
-  cabal:
+  # cabal:
+  #   - path: "./lib"
+  #     component: "lib:yugioh"
+  #   - path: "./exe"
+  #     component: "exe:yugioh"
+  stack:
     - path: "./lib"
-      component: "lib:yugioh"
-    - path: "./exec"
-      component: "exe:yugioh"
+      component: "yugioh:lib"
+    - path: "./exe"
+      component: "yugioh:exe:yugioh"

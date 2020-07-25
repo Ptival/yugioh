@@ -1,7 +1,7 @@
 { nur ? (import ~/personal/nur-packages {})
 }:
 let
-  config = import ./config.nix {};
+  config = import ./config.nix;
   haskell-dev-overlay = nur.overlays.haskell-dev.${config.ghcVersion};
 in
 nur.lib.haskellDevShell {
@@ -11,7 +11,7 @@ nur.lib.haskellDevShell {
   nixpkgsArgs = {
     overlays = [
       haskell-dev-overlay
-      config.yugioh-overlay
+      (nur.lib.applyHaskellOverlay config.ghcVersion config.yugioh-overlay)
     ];
   };
 

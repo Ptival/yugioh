@@ -2,10 +2,10 @@ author:
   - Valentin Robert <valentin.robert.42@gmail.com>
 
 dependencies:
-  - base            ^>= 4.12.0.0
+  - base            ^>= 4.13.0.0
   - ilist           ^>= 0.4.0.0
   - interpolate     ^>= 0.2.0
-  - lens            ^>= 4.17.1
+  - lens            ^>= 4.18.1
   - monad-loops
   - random
   - random-shuffle

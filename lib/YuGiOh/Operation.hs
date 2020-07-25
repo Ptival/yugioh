@@ -46,6 +46,7 @@ import Data.List
 import Data.List.Index (modifyAt)
 import Polysemy (Member, Sem, interpret, makeSem)
 import Polysemy.Embed (Embed, embed)
+import Polysemy.Fail (Fail)
 import Polysemy.Reader (Reader)
 import Polysemy.State (State, get)
 import Polysemy.Writer (Writer)
@@ -177,6 +178,7 @@ directAttack player monster target = do
 runOperation ::
   Member ChooseOption e =>
   Member (Embed IO) e =>
+  Member Fail e =>
   Member Fresh e =>
   Member (Reader Configuration) e =>
   Member (State Duel) e =>
@@ -300,6 +302,7 @@ runOperation operation = case operation of
 handleOperation ::
   Member ChooseOption e =>
   Member (Embed IO) e =>
+  Member Fail e =>
   Member Fresh e =>
   Member (Reader Configuration) e =>
   Member (State Duel) e =>

@@ -1,4 +1,4 @@
-{ nur ? (import ~/personal/nur-packages {})
+{ nur ? import ~/personal/nur-packages {}
 }:
 let
   config = import ./config.nix;
@@ -9,7 +9,7 @@ nur.lib.stackShell {
 
   nixpkgsArgs = {
     overlays = [
-      config.yugioh-overlay
+      # (nur.lib.applyHaskellOverlay config.ghcVersion config.yugioh-overlay)
     ];
   };
 
