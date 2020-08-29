@@ -254,7 +254,7 @@ runOperation operation = case operation of
   ShuffleDeck player ->
     do
       currentDeck <- getLensed (L.deck player)
-      shuffledDeck <- embed (shuffleM currentDeck)
+      shuffledDeck <- embed (shuffleM currentDeck :: IO Deck)
       setLensed (L.deck player) shuffledDeck
   YuGiOh.Operation.SwitchPosition player monster ->
     do

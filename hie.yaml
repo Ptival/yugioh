@@ -1,4 +1,6 @@
 cradle:
   cabal:
+    - path: './exe'
+      component: 'exe:yugioh'
     - path: './lib'
       component: 'lib:yugioh'

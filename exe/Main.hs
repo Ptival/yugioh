@@ -3,6 +3,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 
 -- | Run our simulator!
 module Main
@@ -69,7 +70,7 @@ main = do
         ]
   chooseMoveHandlerDescriptor <- promptForOption prompt options
   Right (duelLog, victory) <-
-    runFinal . embedToFinal
+    runFinal . embedToFinal @IO
       $ handleChooseOption (getChooseOptionHandler chooseMoveHandlerDescriptor)
       $ runFail
       $ (snd <$>) $ runState (Counters 0 0)
