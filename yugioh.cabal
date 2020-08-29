@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ec3bae141219d066ec4061d00e0fabbb40229ef1dc8c963b9c291c52758e669c
+-- hash: e250e4d34c565eb7e64883f92d2278ea517bb3acf82aeaf77beea44ad39c0ad2
 
 name:           yugioh
 version:        0.1.0
@@ -54,16 +54,16 @@ library
       YuGiOh.Type
   hs-source-dirs:
       lib
-  ghc-options: -fplugin=Polysemy.Plugin -Wall -Werror
+  ghc-options: -Wall -Werror
   build-depends:
-      Cabal >=3.2.0.0 && <3.3
-    , base >=4.13.0.0 && <4.14
-    , ilist >=0.4.0.0 && <0.5
-    , interpolate >=0.2.0 && <0.3
-    , lens >=4.18.1 && <4.19
+      Cabal >=3.2.0.0
+    , base >=4.13.0.0
+    , ilist >=0.4.0.0
+    , interpolate >=0.2.0
+    , lens >=4.18.1
     , monad-loops
-    , polysemy >=1.3.0.0 && <1.4
-    , polysemy-plugin >=0.2.5.0 && <0.3
+    , polysemy >=1.3.0.0
+    , polysemy-plugin >=0.2.5.0
     , random
     , random-shuffle
   default-language: Haskell2010
@@ -72,16 +72,16 @@ executable yugioh
   main-is: Main.hs
   hs-source-dirs:
       exe
-  ghc-options: -fplugin=Polysemy.Plugin -Wall -Werror
+  ghc-options: -Wall -Werror
   build-depends:
-      Cabal >=3.2.0.0 && <3.3
-    , base >=4.13.0.0 && <4.14
-    , ilist >=0.4.0.0 && <0.5
-    , interpolate >=0.2.0 && <0.3
-    , lens >=4.18.1 && <4.19
+      Cabal >=3.2.0.0
+    , base >=4.13.0.0
+    , ilist >=0.4.0.0
+    , interpolate >=0.2.0
+    , lens >=4.18.1
     , monad-loops
-    , polysemy >=1.3.0.0 && <1.4
-    , polysemy-plugin >=0.2.5.0 && <0.3
+    , polysemy >=1.3.0.0
+    , polysemy-plugin >=0.2.5.0
     , random
     , random-shuffle
     , yugioh

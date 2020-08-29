@@ -2,17 +2,19 @@ let
 
   name = "yugioh";
   compiler-nix-name = "ghc883";
+  fetchNiv = niv: fetchTarball { inherit (sources.${niv}) url sha256; };
 
   sources = import ./nix/sources.nix {};
-  haskellNix = import (fetchTarball { inherit (sources."haskell.nix") url sha256; }) {};
-  all-hies = import (fetchTarball { inherit (sources.all-hies) url sha256; }) {};
+  haskellNix = import (fetchNiv "haskell.nix") {
+    sourceOverrides = import (fetchNiv "hackage.nix");
+  };
+  all-hies = import (fetchNiv "all-hies") {};
 
-  pkgs =
-    (import haskellNix.sources.nixpkgs-2003 (haskellNix.nixpkgsArgs // {
-      overlays = haskellNix.nixpkgsArgs.overlays ++ [
-        all-hies.overlay
-      ];
-    }));
+  pkgs = import haskellNix.sources.nixpkgs-2003 (haskellNix.nixpkgsArgs // {
+    overlays = haskellNix.nixpkgsArgs.overlays ++ [
+      all-hies.overlay
+    ];
+  });
 
   set = pkgs.haskell-nix.cabalProject {
 
@@ -20,37 +22,27 @@ let
 
     modules = [
 
-      {
-        reinstallableLibGhc = true;
-      }
+      # {
+      #   reinstallableLibGhc = true;
+      # }
 
       {
-        # Make Cabal reinstallable?
+        # Make Cabal reinstallable
         nonReinstallablePkgs = [
 
-          "Win32"
-          "array"
           "array"
           "base"
           "binary"
           "bytestring"
+          # "Cabal"
           "containers"
           "deepseq"
           "directory"
           "filepath"
           "ghc"
-          "ghc-boot"
-          "ghc-boot"
-          "ghc-boot-th"
-          "ghc-compact"
-          "ghc-heap"
           "ghc-prim"
-          "ghc-prim"
-          "ghcjs-prim"
-          "ghcjs-th"
           "hpc"
           "integer-gmp"
-          "integer-simple"
           "mtl"
           "parsec"
           "pretty"
@@ -62,7 +54,6 @@ let
           "time"
           "transformers"
           "unix"
-          "xhtml"
 
         ];
       }
@@ -93,11 +84,14 @@ set.${name}.components.library // {
     '';
 
     tools = {
-      cabal = "3.2.0.0";
+      cabal = {
+        inherit (nix-compiler-name);
+        version = "3.2.0.0";
+      };
       hie = "unstable";
-      # hlint = "2.2.11";
+      hlint = "2.2.11";
       hpack = "0.34.2";
-      # ormolu = "0.1.2.0";
+      ormolu = "0.1.2.0";
     };
 
   };
