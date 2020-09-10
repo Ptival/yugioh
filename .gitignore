@@ -4,3 +4,4 @@
 /dist/
 /dist-newstyle/
 /stack.yaml.lock
+cabal.project.local

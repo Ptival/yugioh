@@ -6,7 +6,9 @@ let
 
   sources = import ./nix/sources.nix {};
   haskellNix = import (fetchNiv "haskell.nix") {
-    sourceOverrides = import (fetchNiv "hackage.nix");
+    sourceOverrides = {
+      hackageSrc = fetchNiv "hackage.nix";
+    };
   };
   all-hies = import (fetchNiv "all-hies") {};
 
