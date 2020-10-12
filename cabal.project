@@ -1,0 +1,20 @@
+packages:
+  ./
+
+source-repository-package
+  location: https://github.com/bubba/brittany.git
+  tag: c59655f10d5ad295c2481537fc8abf0a297d9d1c
+  type: git
+  --sha256: 1rkk09f8750qykrmkqfqbh44dbx1p8aq1caznxxlw8zqfvx39cxl
+
+source-repository-package
+  location: https://github.com/haskell/ghcide.git
+  tag: 078e3d3c0d319f83841ccbcdc60ff5f0e243f6be
+  type: git
+  --sha256: 1zq7ngaak8il91a309rl51dghzasnk4m2sm3av6d93cyqyra1hfc
+
+source-repository-package
+  location: https://github.com/haskell/haskell-language-server.git
+  tag: 0a18edde24923251a148cbbc0ae993a6aac83b9c
+  type: git
+  --sha256: 0b94l6bywa6jk20y2cswyq5ks4g515895k2apvr1mdfkfhngdb7b

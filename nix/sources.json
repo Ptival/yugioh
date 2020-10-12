@@ -11,16 +11,28 @@
         "url": "https://github.com/infinisil/all-hies/archive/534ac517b386821b787d1edbd855b9966d0c0775.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "all-hls": {
+        "branch": "master",
+        "description": null,
+        "homepage": "",
+        "owner": "masaeedu",
+        "repo": "all-hls",
+        "rev": "643cfcb07a724c31464f969320faee4df4931b10",
+        "sha256": "1wxmz4iqmyazwfyzwc0s0dkvxyk2c7c7qllbx2yyn6kj1dj3p0ay",
+        "type": "tarball",
+        "url": "https://github.com/masaeedu/all-hls/archive/643cfcb07a724c31464f969320faee4df4931b10.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "hackage.nix": {
         "branch": "master",
         "description": "Automatically generated Nix expressions for Hackage",
         "homepage": "",
         "owner": "input-output-hk",
         "repo": "hackage.nix",
-        "rev": "a840efede196a3d5f0e4da1deed0010dfc2f163e",
-        "sha256": "09bnf5la24yav989pdx77lzhf0r0jy4nzsf46fd8i0dgf3rkgwra",
+        "rev": "659f427075af5f4f9e37f32cedb9dbb415d49b4a",
+        "sha256": "0xb2s0j9abkz4cj06z5gyabqqrv0lgzy5lf30dgcicj6yscfcwy3",
         "type": "tarball",
-        "url": "https://github.com/input-output-hk/hackage.nix/archive/a840efede196a3d5f0e4da1deed0010dfc2f163e.tar.gz",
+        "url": "https://github.com/input-output-hk/hackage.nix/archive/659f427075af5f4f9e37f32cedb9dbb415d49b4a.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "haskell.nix": {
@@ -29,10 +41,10 @@
         "homepage": "https://input-output-hk.github.io/haskell.nix",
         "owner": "input-output-hk",
         "repo": "haskell.nix",
-        "rev": "de67bc41739ec88212fc1782a8287f66781a018d",
-        "sha256": "0srsffrjv4n2797ak1dw1wcfs0bb5g19n05mdnh8whb9w51ydpif",
+        "rev": "1140e5267242048159fd07ebae94fa78cd0081f8",
+        "sha256": "1a23ii9msi5hf23kl9nf30glqpbps70q5cplfh7cciq75yaf3g68",
         "type": "tarball",
-        "url": "https://github.com/input-output-hk/haskell.nix/archive/de67bc41739ec88212fc1782a8287f66781a018d.tar.gz",
+        "url": "https://github.com/input-output-hk/haskell.nix/archive/1140e5267242048159fd07ebae94fa78cd0081f8.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -41,22 +53,22 @@
         "homepage": "https://github.com/nmattia/niv",
         "owner": "nmattia",
         "repo": "niv",
-        "rev": "dd13098d01eaa6be68237e7e38f96782b0480755",
-        "sha256": "1cfjdbsn0219fjzam1k7nqzkz8fb1ypab50rhyj026qbklqq2kvq",
+        "rev": "9d35b9e4837ab88517210b1701127612c260eccf",
+        "sha256": "0q50xhnm8g2yfyakrh0nly4swyygxpi0a8cb9gp65wcakcgvzvdh",
         "type": "tarball",
-        "url": "https://github.com/nmattia/niv/archive/dd13098d01eaa6be68237e7e38f96782b0480755.tar.gz",
+        "url": "https://github.com/nmattia/niv/archive/9d35b9e4837ab88517210b1701127612c260eccf.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
-        "branch": "nixos-20.09",
+        "branch": "nixpkgs-unstable",
         "description": "A read-only mirror of NixOS/nixpkgs tracking the released channels. Send issues and PRs to",
         "homepage": "https://github.com/NixOS/nixpkgs",
         "owner": "NixOS",
         "repo": "nixpkgs-channels",
-        "rev": "d351e49b641f3bb12a4e447b7d1ba9e953db5e1a",
-        "sha256": "149v4590cy5yplj41a0x0mgmkl2gkh6shhwr180bpf50wlrk57zp",
+        "rev": "502845c3e31ef3de0e424f3fcb09217df2ce6df6",
+        "sha256": "0fcqpsy6y7dgn0y0wgpa56gsg0b0p8avlpjrd79fp4mp9bl18nda",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs-channels/archive/d351e49b641f3bb12a4e447b7d1ba9e953db5e1a.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs-channels/archive/502845c3e31ef3de0e424f3fcb09217df2ce6df6.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }

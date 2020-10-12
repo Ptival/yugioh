@@ -3,8 +3,6 @@ cabal-version: 1.12
 -- This file has been generated from package.yaml by hpack version 0.34.2.
 --
 -- see: https://github.com/sol/hpack
---
--- hash: e250e4d34c565eb7e64883f92d2278ea517bb3acf82aeaf77beea44ad39c0ad2
 
 name:           yugioh
 version:        0.1.0
